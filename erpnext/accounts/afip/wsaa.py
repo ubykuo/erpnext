@@ -16,7 +16,8 @@
 # Definir WSDL, CERT, PRIVATEKEY, PASSPHRASE, SERVICE, WSAAURL
 # Devuelve TA.xml (ticket de autorización de WSAA)
 
-__author__ = "Mariano Reingart (reingart@gmail.com)"
+__author__ = "Mariano Reingart (reingart" \
+             "@gmail.com)"
 __copyright__ = "Copyright (C) 2008-2011 Mariano Reingart"
 __license__ = "GPL 3.0"
 __version__ = "2.11c"
@@ -56,7 +57,7 @@ CACERT = "conf/afip_ca_info.crt" # WSAA CA Cert (Autoridades de Confiaza)
 HOMO = False
 TYPELIB = False
 DEFAULT_TTL = 60*60*5       # five hours
-DEBUG = False
+DEBUG = True
 
 # No debería ser necesario modificar nada despues de esta linea
 
@@ -289,6 +290,10 @@ class WSAA(BaseWS):
     def Autenticar(self, service, crt, key, wsdl=None, proxy=None, wrapper=None, cacert=None, cache=None, debug=False):
         "Método unificado para obtener el ticket de acceso (cacheado)"
 
+        print crt
+        print key
+        print service
+
         self.LanzarExcepciones = True
         try:
             # sanity check: verificar las credenciales
@@ -297,6 +302,7 @@ class WSAA(BaseWS):
                     raise RuntimeError("Imposible abrir %s\n" % filename)
             # creo el nombre para el archivo del TA (según credenciales y ws) 
             fn = "TA-%s.xml" % hashlib.md5(service + crt + key).hexdigest()
+            print fn
             if cache:
                 fn = os.path.join(cache, fn)
             else:
