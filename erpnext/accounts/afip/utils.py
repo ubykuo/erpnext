@@ -263,12 +263,12 @@ class BaseWS:
                     raise RuntimeError("Error de configuracion CACERT ver DebugLog")
                     return False
                     
-            self.log("Conectando a wsdl=%s cache=%s proxy=%s" % (wsdl, cache, proxy_dict))
+            self.log("Conectando a wsdl=%s cache=%s proxy=%s cacert=%s" % (wsdl, cache, proxy_dict, cacert))
             # analizar espacio de nombres (axis vs .net):
             ns = 'ser' if self.WSDL[-5:] == "?wsdl" else None
             self.client = SoapClient(
                 wsdl = wsdl,        
-                cache = cache,
+                cache = False,
                 proxy = proxy_dict,
                 cacert = cacert,
                 timeout = timeout,

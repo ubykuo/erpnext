@@ -22,7 +22,7 @@ from erpnext.stock.doctype.serial_no.serial_no import get_serial_nos, get_delive
 from erpnext.setup.doctype.company.company import update_company_current_month_sales
 from erpnext.accounts.general_ledger import get_round_off_account_and_cost_center
 
-from erpnext.accounts.doctype.sales_invoice.afip import authorize_invoice
+from erpnext.accounts.afip.afip import authorize_invoice
 
 form_grid_templates = {
     "items": "templates/form_grid/item_grid.html"
@@ -150,7 +150,7 @@ class SalesInvoice(SellingController):
         self.update_project()
 
         # Authorize Invoice in AFIP
-        if self.authorize:
+        if self.authorize_afip:
             authorize_invoice(self)
 
     def validate_pos_paid_amount(self):

@@ -27,6 +27,7 @@ import unicodedata
 from pysimplesoap.client import SimpleXMLElement
 from utils import inicializar_y_capturar_excepciones, BaseWS, get_install_dir, \
      exception_info, safe_console, date
+
 try:
     from M2Crypto import BIO, Rand, SMIME, SSL
 except ImportError:
@@ -34,7 +35,7 @@ except ImportError:
     warnings.warn("No es posible importar M2Crypto (OpenSSL)")
     warnings.warn(ex['msg'])            # revisar instalación y DLLs de OpenSSL
     BIO = Rand = SMIME = SSL = None
-    # utilizar alternativa (ejecutar proceso por separado) 
+    # utilizar alternativa (ejecutar proceso por separado)
     from subprocess import Popen, PIPE
     from base64 import b64encode
 
@@ -113,7 +114,7 @@ def sign_tra(tra,cert=CERT,privatekey=PRIVATEKEY,passphrase=""):
     else:
         # Firmar el texto (tra) usando OPENSSL directamente
         try:
-            if sys.platform == "linux2":
+            if sys.platform == "linux2" or sys.platform == "darwin":
                 openssl = "openssl"
             else:
                 if sys.maxsize <= 2**32:
@@ -289,11 +290,6 @@ class WSAA(BaseWS):
 
     def Autenticar(self, service, crt, key, wsdl=None, proxy=None, wrapper=None, cacert=None, cache=None, debug=False):
         "Método unificado para obtener el ticket de acceso (cacheado)"
-
-        print crt
-        print key
-        print service
-
         self.LanzarExcepciones = True
         try:
             # sanity check: verificar las credenciales
