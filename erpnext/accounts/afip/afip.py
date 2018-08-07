@@ -1,6 +1,7 @@
 import frappe
 import datetime
 import os
+from frappe import _
 from erpnext.accounts.afip.wsaa import WSAA
 from erpnext.accounts.afip.wsfev1 import WSFEv1
 
@@ -38,11 +39,10 @@ def authorize_local_invoice (invoice):
     if invoice.get_currency().currency_name == 'ARS':
         exchange_rate = '1.00'
     else:
-        exchange_rate = frappe.get_value("Currency Exchange", {"date": invoice.posting_date, "to_currency": "ARS"})
-        if exchange_rate:
-            exchange_rate = str(exchange_rate.exchange_rate)
-        else:
-            frappe.throw(_("Specify Exchange Rate to convert from {0} to {1}").format(invoice.currency, "ARS"))
+        try:
+            exchange_rate = service.ParamGetCotizacion(invoice.get_currency().afip_code)
+        except KeyError as e:
+            frappe.throw(_("Invalid Currency, Check AFIP code"))
 
     service.CrearFactura(invoice.get_concept().code, invoice.get_customer().get_id_type().code, invoice.get_customer().id_number,
                       invoice.get_invoice_type().code, invoice.point_of_sale, last_voucher_number + 1, last_voucher_number + 1,
