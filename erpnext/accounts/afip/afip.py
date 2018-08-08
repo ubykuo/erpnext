@@ -42,10 +42,16 @@ def authorize_local_invoice (invoice):
 
     service.CrearFactura(invoice.concept, invoice.get_customer().get_id_type().code, invoice.get_customer().id_number,
                       invoice.invoice_type, invoice.point_of_sale, last_voucher_number + 1, last_voucher_number + 1,
-                      invoice.grand_total, 0 , invoice.grand_total,
+                      invoice.grand_total, 0 , invoice.total,
                       0, 0, 0, invoice_date, None,
                       None, None,
                       invoice.get_currency().afip_code, exchange_rate)
+
+    if invoice.invoice_type == "1": # Factura A
+        iva_amount = (invoice.total * get_iva_rate(service,invoice.iva_type)) / 100
+        service.AgregarIva(invoice.iva_type, invoice.total, iva_amount)
+        service.EstablecerCampoFactura("imp_iva", iva_amount)
+        service.EstablecerCampoFactura("imp_total", invoice.total + iva_amount)
 
     service.CAESolicitar()
     if service.Resultado == 'A':
@@ -53,6 +59,14 @@ def authorize_local_invoice (invoice):
         invoice.cae_due_date = datetime.datetime.strptime(service.Vencimiento, '%Y%m%d').date()
     else:
         frappe.throw(service.Obs)
+
+def get_iva_rate(service, iva_code):
+    all_iva_types = service.ParamGetTiposIva()
+    selected_iva = filter(lambda i: i.split("|")[0] == iva_code , all_iva_types)
+    if not selected_iva:
+        frappe.throw(_("Invalid IVA Type"))
+    selected_iva = selected_iva[0].split("|")
+    return float(selected_iva[1][:-1]) # remove % character
 
 def authorize_export_invoice(invoice):
     pass

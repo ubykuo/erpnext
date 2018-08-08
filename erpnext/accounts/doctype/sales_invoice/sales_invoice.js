@@ -36,6 +36,7 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 
 		load_invoice_types(this.frm);
 		load_invoice_concepts(this.frm);
+		load_iva_types(this.frm);
 	},
 
 	refresh: function(doc, dt, dn) {
@@ -657,6 +658,18 @@ var load_invoice_concepts = function (frm) {
            if (r.message) {
               frm.set_df_property("concept", "options", r.message);
               frm.refresh_field("concept");
+           }
+       }
+    });
+}
+
+var load_iva_types = function (frm) {
+   frappe.call({
+       method: "erpnext.accounts.doctype.sales_invoice.sales_invoice.get_iva_types",
+       callback: function (r) {
+           if (r.message) {
+              frm.set_df_property("iva_type", "options", r.message);
+              frm.refresh_field("iva_type");
            }
        }
     });

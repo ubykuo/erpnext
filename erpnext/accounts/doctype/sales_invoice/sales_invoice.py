@@ -1030,4 +1030,15 @@ def get_invoice_concepts():
         response.append({"value": concept[0], "label": concept[1]})
     return response
 
+@frappe.whitelist()
+def get_iva_types():
+    response = []
+    service = connect_afip("wsfe")
+    iva_types = service.ParamGetTiposIva()
+    for iva_type in iva_types:
+        iva_type = iva_type.split("|")
+        response.append({"value": iva_type[0], "label": iva_type[1]})
+    return response
+
+
 
