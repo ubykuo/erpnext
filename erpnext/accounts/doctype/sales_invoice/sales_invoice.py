@@ -22,7 +22,7 @@ from erpnext.stock.doctype.serial_no.serial_no import get_serial_nos, get_delive
 from erpnext.setup.doctype.company.company import update_company_current_month_sales
 from erpnext.accounts.general_ledger import get_round_off_account_and_cost_center
 
-from erpnext.accounts.afip.afip import authorize_invoice
+from erpnext.accounts.afip.afip import authorize_invoice, connect_afip
 
 form_grid_templates = {
     "items": "templates/form_grid/item_grid.html"
@@ -1009,3 +1009,25 @@ def set_account_for_mode_of_payment(self):
     for data in self.payments:
         if not data.account:
             data.account = get_bank_cash_account(data.mode_of_payment, self.company).get("account")
+
+@frappe.whitelist()
+def get_invoice_types():
+    response = []
+    service = connect_afip("wsfe")
+    invoice_types = service.ParamGetTiposCbte()
+    for invoice_type in invoice_types:
+        invoice_type = invoice_type.split("|")
+        response.append({"value": invoice_type[0], "label": invoice_type[1]})
+    return response
+
+@frappe.whitelist()
+def get_invoice_concepts():
+    response = []
+    service = connect_afip("wsfe")
+    invoice_concepts = service.ParamGetTiposConcepto()
+    for concept in invoice_concepts:
+        concept = concept.split("|")
+        response.append({"value": concept[0], "label": concept[1]})
+    return response
+
+

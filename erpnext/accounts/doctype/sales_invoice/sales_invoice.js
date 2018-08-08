@@ -33,6 +33,9 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 			me.frm.script_manager.trigger("is_pos");
 			me.frm.refresh_fields();
 		}
+
+		load_invoice_types(this.frm);
+		load_invoice_concepts(this.frm);
 	},
 
 	refresh: function(doc, dt, dn) {
@@ -633,4 +636,30 @@ var calculate_total_billing_amount =  function(frm) {
 
 	refresh_field('total_billing_amount')
 }
+
+var load_invoice_types = function (frm) {
+    frappe.call({
+       method: "erpnext.accounts.doctype.sales_invoice.sales_invoice.get_invoice_types",
+       callback: function (r) {
+           if (r.message) {
+              frm.set_df_property("invoice_type", "options", r.message);
+              frm.refresh_field("invoice_type");
+           }
+
+       }
+    });
+}
+
+var load_invoice_concepts = function (frm) {
+    frappe.call({
+       method: "erpnext.accounts.doctype.sales_invoice.sales_invoice.get_invoice_concepts",
+       callback: function (r) {
+           if (r.message) {
+              frm.set_df_property("concept", "options", r.message);
+              frm.refresh_field("concept");
+           }
+       }
+    });
+}
+
 
