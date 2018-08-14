@@ -937,6 +937,7 @@ class SalesInvoice(SellingController):
             if not self.get(field):
                 frappe.throw(_("{0} is mandatory").format(self.meta.get_label(field)))
         self.validate_iva_type()
+        self.validate_concept()
         authorize_invoice(self)
 
     def validate_iva_type(self):
@@ -947,6 +948,22 @@ class SalesInvoice(SellingController):
         if self.invoice_type in ("1", "6") and (not self.iva_type):
             frappe.throw(_("IVA is mandatory in A and B invoices. In B invoices, IVA is generally 0%"))
 
+    def validate_concept(self):
+        """
+        check that entered concept code is valid in AFIP concept codes.
+        1 - 'Productos'
+        2 - 'Servicios'
+        3 - 'Productos y Servicios'
+        If concept is 2 or 3, service start date, service end date and payment due date are required
+        :return:
+        """
+        selected_concept = filter(lambda c: c["value"] == self.concept, get_invoice_concepts())
+        if not selected_concept:
+            frappe.throw(_("Invalid {0}".format(self.meta.get_label("concept"))))
+        if self.concept in ("2", "3"):
+            for field in ("due_date", "service_start_date", "service_end_date"):
+                if not self.get(field):
+                    frappe.throw(_("{0} is required when concept include Services").format(self.meta.get_label(field)))
 
 
 def get_list_context(context=None):

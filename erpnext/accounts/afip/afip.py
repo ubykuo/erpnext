@@ -34,7 +34,6 @@ def authorize_invoice(invoice):
 
 def authorize_local_invoice (invoice):
     service = connect_afip("wsfe", invoice.get_company())
-    invoice_date = "".join(invoice.posting_date.split("-"))
     last_voucher_number = long (service.CompUltimoAutorizado(invoice.invoice_type, invoice.point_of_sale) or 0)
     if invoice.get_currency().currency_name == 'ARS':
         exchange_rate = '1.00'
@@ -46,8 +45,8 @@ def authorize_local_invoice (invoice):
     service.CrearFactura(invoice.concept, invoice.get_customer().get_id_type().code, invoice.get_customer().id_number,
                       invoice.invoice_type, invoice.point_of_sale, last_voucher_number + 1, last_voucher_number + 1,
                       invoice.grand_total, 0 , invoice.total,
-                      0, 0, 0, invoice_date, None,
-                      None, None,
+                      0, 0, 0, date_to_string(invoice.posting_date), date_to_string(invoice.due_date),
+                    date_to_string(invoice.service_start_date), date_to_string(invoice.service_end_date),
                       invoice.get_currency().afip_code, exchange_rate)
     if invoice.invoice_type in ("1", "6"): # Factura A or B
         iva_amount = (invoice.total * get_iva_rate(service,invoice.iva_type)) / 100
@@ -60,6 +59,11 @@ def authorize_local_invoice (invoice):
         invoice.cae_due_date = datetime.datetime.strptime(service.Vencimiento, '%Y%m%d').date()
     else:
         frappe.throw(service.Obs)
+
+def date_to_string(date):
+    """ returns a string representing date in AFIP format"""
+    return "".join(date.split("-")) if date else None
+
 
 def get_iva_rate(service, iva_code):
     all_iva_types = service.ParamGetTiposIva()
