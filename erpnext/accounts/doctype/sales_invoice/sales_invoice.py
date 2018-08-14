@@ -151,7 +151,7 @@ class SalesInvoice(SellingController):
 
         # Authorize Invoice in AFIP
         if self.authorize_afip:
-            authorize_invoice(self)
+            self.authorize_invoice()
 
     def validate_pos_paid_amount(self):
         if len(self.payments) == 0 and self.is_pos:
@@ -928,6 +928,23 @@ class SalesInvoice(SellingController):
 
     def get_currency(self):
         return frappe.get_doc("Currency", self.currency)
+
+    def authorize_invoice(self):
+        for field in ("point_of_sale", "concept", "invoice_type"):
+            if not self.get(field):
+                frappe.throw(_("{0} is mandatory").format(self.meta.get_label(field)))
+        self.validate_iva_type()
+        authorize_invoice(self)
+
+    def validate_iva_type(self):
+        """
+        1 - 'Factura A'
+        6 - 'Factura B'
+        """
+        if self.invoice_type in ("1", "6") and (not self.iva_type):
+            frappe.throw(_("IVA is mandatory in A and B invoices. In B invoices, IVA is generally 0%"))
+
+
 
 def get_list_context(context=None):
     from erpnext.controllers.website_list_for_contact import get_list_context
