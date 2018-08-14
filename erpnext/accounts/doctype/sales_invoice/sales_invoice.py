@@ -917,6 +917,9 @@ class SalesInvoice(SellingController):
             if entry.amount < 0:
                 frappe.throw(_("Row #{0} (Payment Table): Amount must be positive").format(entry.idx))
 
+    def get_company(self):
+        return frappe.get_doc("Company", self.company)
+
     def get_concept(self):
         return frappe.get_doc("Invoice Concept", self.concept)
 
