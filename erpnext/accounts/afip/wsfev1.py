@@ -932,6 +932,8 @@ class WSFEv1(BaseWS):
     @inicializar_y_capturar_excepciones
     def ParamGetCotizacion(self, moneda_id):
         "Recuperador de cotización de moneda"
+        if moneda_id == 'PES':
+            return '1.00'
         ret = self.client.FEParamGetCotizacion(
             Auth={'Token': self.Token, 'Sign': self.Sign, 'Cuit': self.Cuit},
             MonId=moneda_id,
