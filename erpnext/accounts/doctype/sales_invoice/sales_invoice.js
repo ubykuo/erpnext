@@ -598,6 +598,17 @@ frappe.ui.form.on('Sales Invoice', {
 				refresh_field(['timesheets'])
 			}
 		})
+	},
+
+	authorize_afip: function (frm) {
+	    set_afip_required_fields(frm);
+	},
+
+	concept: function (frm) {
+	    change_service_dates_type(frm);
+	},
+	invoice_type: function (frm) {
+	    change_iva_type(frm);
 	}
 })
 
@@ -644,6 +655,7 @@ var load_invoice_types = function (frm) {
        callback: function (r) {
            if (r.message) {
               frm.set_df_property("invoice_type", "options", r.message);
+              frm.set_value("invoice_type", r.message[0].value);
               frm.refresh_field("invoice_type");
            }
 
@@ -657,6 +669,7 @@ var load_invoice_concepts = function (frm) {
        callback: function (r) {
            if (r.message) {
               frm.set_df_property("concept", "options", r.message);
+              frm.set_value("concept", 2);
               frm.refresh_field("concept");
            }
        }
@@ -669,10 +682,34 @@ var load_iva_types = function (frm) {
        callback: function (r) {
            if (r.message) {
               frm.set_df_property("iva_type", "options", r.message);
+              frm.set_value("iva_type", 5);
               frm.refresh_field("iva_type");
            }
        }
     });
 }
+
+var set_afip_required_fields = function (frm) {
+    // set point_of_sale, invoice_type and concept fields as required
+    frm.toggle_reqd("point_of_sale", frm.doc.authorize_afip);
+    frm.toggle_reqd("invoice_type", frm.doc.authorize_afip);
+    frm.toggle_reqd("concept", frm.doc.authorize_afip);
+}
+
+var change_service_dates_type = function (frm) {
+    var required_dates = frm.doc.concept == "2" || frm.doc.concept == "3";
+    frm.toggle_reqd("service_start_date",required_dates);
+    frm.set_df_property("service_start_date", "hidden", !required_dates);
+    frm.toggle_reqd("service_end_date", required_dates);
+    frm.set_df_property("service_end_date", "hidden", !required_dates);
+}
+
+var change_iva_type = function (frm) {
+    var required_iva = frm.doc.invoice_type == "1" || frm.doc.invoice_type == "6";
+    frm.toggle_reqd("iva_type",required_iva);
+    frm.set_df_property("iva_type", "hidden", !required_iva);
+
+}
+
 
 
