@@ -13,6 +13,8 @@ from erpnext.accounts.party import validate_party_accounts, get_dashboard_info, 
 from frappe.contacts.address_and_contact import load_address_and_contact, delete_contact_and_address
 from frappe.model.rename_doc import update_linked_doctypes
 
+from erpnext.accounts.afip.afip import connect_afip
+
 class Customer(TransactionBase):
     def get_feed(self):
         return self.customer_name
@@ -329,3 +331,14 @@ def get_customer_primary_contact(doctype, txt, searchfield, start, page_len, fil
             'customer': customer,
             'txt': '%%%s%%' % txt
         })
+
+@frappe.whitelist()
+def get_id_types():
+    response = []
+    service = connect_afip("wsfe")
+    id_types = service.ParamGetTiposDoc()
+    for id_type in id_types:
+        id_type = id_type.split("|")
+        response.append({"value": id_type[0], "label": id_type[0] + " - " + id_type[1]})
+    return response
+

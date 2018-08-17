@@ -938,6 +938,7 @@ class SalesInvoice(SellingController):
                 frappe.throw(_("{0} is mandatory").format(self.meta.get_label(field)))
         self.validate_iva_type()
         self.validate_concept()
+        self.validate_customer_id()
         authorize_invoice(self)
 
     def validate_iva_type(self):
@@ -964,6 +965,11 @@ class SalesInvoice(SellingController):
             for field in ("due_date", "service_start_date", "service_end_date"):
                 if not self.get(field):
                     frappe.throw(_("{0} is required when concept include Services").format(self.meta.get_label(field)))
+
+    def validate_customer_id(self):
+        if not self.get_customer().id_type or not self.get_customer().id_number:
+            frappe.throw(_("ID type and ID number of customer are required"))
+
 
 
 def get_list_context(context=None):
