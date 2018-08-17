@@ -26,6 +26,8 @@ def connect_afip(service_name, company=None):
 
 def authorize_invoice(invoice):
     """
+    1 - 'Factura A'
+    6 - 'Factura B'
     19 - 'Factura E'
     :param invoice: to authorize
     :return:
@@ -35,24 +37,18 @@ def authorize_invoice(invoice):
 def authorize_local_invoice (invoice):
     service = connect_afip("wsfe", invoice.get_company())
     last_voucher_number = long (service.CompUltimoAutorizado(invoice.invoice_type, invoice.point_of_sale) or 0)
-    if invoice.get_currency().currency_name == 'ARS':
-        exchange_rate = '1.00'
-    else:
-        try:
-            exchange_rate = service.ParamGetCotizacion(invoice.get_currency().afip_code)
-        except KeyError as e:
-            frappe.throw(_("Invalid Currency, Check AFIP code"))
-    service.CrearFactura(invoice.concept, invoice.get_customer().get_id_type().code, invoice.get_customer().id_number,
+    try:
+        exchange_rate = service.ParamGetCotizacion(invoice.get_currency().afip_code)
+    except KeyError as e:
+        frappe.throw(_("Invalid Currency, Check AFIP code"))
+    service.CrearFactura(invoice.concept, invoice.get_customer().id_type, invoice.get_customer().id_number,
                       invoice.invoice_type, invoice.point_of_sale, last_voucher_number + 1, last_voucher_number + 1,
                       invoice.grand_total, 0 , invoice.total,
                       0, 0, 0, date_to_string(invoice.posting_date), date_to_string(invoice.due_date),
                     date_to_string(invoice.service_start_date), date_to_string(invoice.service_end_date),
                       invoice.get_currency().afip_code, exchange_rate)
     if invoice.invoice_type in ("1", "6"): # Factura A or B
-        iva_amount = (invoice.total * get_iva_rate(service,invoice.iva_type)) / 100
-        service.AgregarIva(invoice.iva_type, invoice.total, iva_amount)
-        service.EstablecerCampoFactura("imp_iva", iva_amount)
-        service.EstablecerCampoFactura("imp_total", invoice.total + iva_amount)
+        add_iva(service, invoice)
     service.CAESolicitar()
     if service.Resultado == 'A':
         invoice.cae = service.CAE
@@ -72,6 +68,12 @@ def get_iva_rate(service, iva_code):
         frappe.throw(_("Invalid IVA Type"))
     selected_iva = selected_iva[0].split("|")
     return float(selected_iva[1][:-1]) # remove % character
+
+def add_iva(service, invoice):
+    iva_amount = (invoice.total * get_iva_rate(service, invoice.iva_type)) / 100
+    service.AgregarIva(invoice.iva_type, invoice.total, iva_amount)
+    service.EstablecerCampoFactura("imp_iva", iva_amount)
+    service.EstablecerCampoFactura("imp_total", invoice.total + iva_amount)
 
 def authorize_export_invoice(invoice):
     pass
