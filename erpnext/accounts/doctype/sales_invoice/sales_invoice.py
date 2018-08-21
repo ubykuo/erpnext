@@ -1083,5 +1083,16 @@ def get_iva_types():
         response.append({"value": iva_type[0], "label": iva_type[1]})
     return response
 
+@frappe.whitelist()
+def get_points_of_sale():
+    response = []
+    service = connect_afip("wsfe")
+    points_of_sale = service.ParamGetPtosVenta()
+    for point_of_sale in points_of_sale:
+        point_of_sale = point_of_sale.split("|")
+        response.append({"value": point_of_sale[0], "label": point_of_sale[1] + " - " + point_of_sale[0]})
+    return response
+
+
 
 

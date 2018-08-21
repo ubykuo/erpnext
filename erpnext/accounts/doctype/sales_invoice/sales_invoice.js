@@ -40,6 +40,7 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 		    load_invoice_types(this.frm);
             load_invoice_concepts(this.frm);
             load_iva_types(this.frm);
+            load_points_of_sale(this.frm);
 		}
 
 	},
@@ -721,6 +722,19 @@ var set_field_default_value = function (frm, field, value) {
     if (frm.doc.__islocal) {
         frm.set_value(field,value);
     }
+}
+
+var load_points_of_sale = function (frm) {
+    frappe.call({
+       method: "erpnext.accounts.doctype.sales_invoice.sales_invoice.get_points_of_sale",
+       callback: function (r) {
+           if (r.message) {
+              frm.set_df_property("point_of_sale", "options", r.message);
+              set_field_default_value(frm,"point_of_sale", r.message[0].value);
+              frm.refresh_field("point_of_sale");
+           }
+       }
+    });
 }
 
 
