@@ -34,9 +34,14 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 			me.frm.refresh_fields();
 		}
 
-		load_invoice_types(this.frm);
-		load_invoice_concepts(this.frm);
-		load_iva_types(this.frm);
+        // Load invoice types, invoice concepts and iva types when creating a new invoice
+		if (this.frm.doc.docstatus != 1) {
+		    set_afip_required_fields(this.frm);
+		    load_invoice_types(this.frm);
+            load_invoice_concepts(this.frm);
+            load_iva_types(this.frm);
+		}
+
 	},
 
 	refresh: function(doc, dt, dn) {
@@ -655,7 +660,7 @@ var load_invoice_types = function (frm) {
        callback: function (r) {
            if (r.message) {
               frm.set_df_property("invoice_type", "options", r.message);
-              frm.set_value("invoice_type", r.message[0].value);
+              set_field_default_value(frm,"invoice_type", r.message[0].value);
               frm.refresh_field("invoice_type");
            }
 
@@ -669,7 +674,7 @@ var load_invoice_concepts = function (frm) {
        callback: function (r) {
            if (r.message) {
               frm.set_df_property("concept", "options", r.message);
-              frm.set_value("concept", 2);
+              set_field_default_value(frm, "concept", 2);
               frm.refresh_field("concept");
            }
        }
@@ -682,7 +687,7 @@ var load_iva_types = function (frm) {
        callback: function (r) {
            if (r.message) {
               frm.set_df_property("iva_type", "options", r.message);
-              frm.set_value("iva_type", 5);
+              set_field_default_value(frm, "iva_type", 5);
               frm.refresh_field("iva_type");
            }
        }
@@ -709,6 +714,13 @@ var change_iva_type = function (frm) {
     frm.toggle_reqd("iva_type",required_iva);
     frm.set_df_property("iva_type", "hidden", !required_iva);
 
+}
+
+
+var set_field_default_value = function (frm, field, value) {
+    if (frm.doc.__islocal) {
+        frm.set_value(field,value);
+    }
 }
 
 
