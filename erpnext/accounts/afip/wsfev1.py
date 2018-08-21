@@ -31,7 +31,7 @@ import os
 import sys
 from utils import verifica, inicializar_y_capturar_excepciones, BaseWS, get_install_dir
 
-HOMO = False                    # solo homologación
+HOMO = True                    # solo homologación
 TYPELIB = False                 # usar librería de tipos (TLB)
 LANZAR_EXCEPCIONES = False      # valor por defecto: True
 
@@ -944,7 +944,9 @@ class WSFEv1(BaseWS):
         
     @inicializar_y_capturar_excepciones
     def ParamGetPtosVenta(self, sep="|"):
-        "Recuperador de valores referenciales Puntos de Venta registrados"
+        "Recuperador de valores referenciales Puntos de Venta registrados. En homologacion devuelve puntos de venta aleatorios"
+        if self.HOMO:
+            return ["111|Facturacion Electronica", "222|Factura de Exportacion"]
         ret = self.client.FEParamGetPtosVenta(
             Auth={'Token': self.Token, 'Sign': self.Sign, 'Cuit': self.Cuit},
             )
