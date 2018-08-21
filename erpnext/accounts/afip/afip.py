@@ -51,8 +51,8 @@ def authorize_local_invoice (invoice):
         add_iva(service, invoice)
     service.CAESolicitar()
     if service.Resultado == 'A':
-        invoice.cae = service.CAE
-        invoice.cae_due_date = datetime.datetime.strptime(service.Vencimiento, '%Y%m%d').date()
+        invoice.db_set("cae", service.CAE)
+        invoice.db_set("cae_due_date", datetime.datetime.strptime(service.Vencimiento, '%Y%m%d').date())
     else:
         frappe.throw(service.Obs)
 
