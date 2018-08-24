@@ -336,7 +336,7 @@ class WSFEv1(BaseWS):
         return result['RegXReq']
 
     @inicializar_y_capturar_excepciones
-    def CompUltimoAutorizado(self, tipo_cbte, punto_vta):
+    def GetLastCMP(self, tipo_cbte, punto_vta):
         ret = self.client.FECompUltimoAutorizado(
             Auth={'Token': self.Token, 'Sign': self.Sign, 'Cuit': self.Cuit},
             PtoVta=punto_vta,
@@ -954,6 +954,35 @@ class WSFEv1(BaseWS):
         return [(u"%(Nro)s\tEmisionTipo:%(EmisionTipo)s\tBloqueado:%(Bloqueado)s\tFchBaja:%(FchBaja)s" % p['PtoVenta']).replace("\t", sep)
                  for p in res.get('ResultGet', [])]
 
+    # UBYKUO ERPNEXT
+
+    def add_invoice(self, invoice, exchange_rate):
+        last_voucher_number = long (self.GetLastCMP(invoice.invoice_type, invoice.point_of_sale) or 0)
+        self.CrearFactura(invoice.concept, invoice.get_customer().id_type, invoice.get_customer().id_number,
+                             invoice.invoice_type, invoice.point_of_sale, last_voucher_number + 1,
+                             last_voucher_number + 1,
+                             invoice.grand_total, 0, invoice.total,
+                             0, 0, 0, self.date_to_string(invoice.posting_date), self.date_to_string(invoice.due_date),
+                             self.date_to_string(invoice.service_start_date), self.date_to_string(invoice.service_end_date),
+                             invoice.get_currency().afip_code, exchange_rate)
+
+        if invoice.invoice_type in ("1", "6"):  # Factura A or B
+            self.add_iva(invoice)
+
+    def get_iva_rate(self, iva_code):
+        all_iva_types = self.ParamGetTiposIva()
+        selected_iva = filter(lambda i: i.split("|")[0] == iva_code, all_iva_types)
+        if not selected_iva:
+            return None
+        selected_iva = selected_iva[0].split("|")
+        return float(selected_iva[1][:-1])  # remove % character
+
+    def add_iva(self, invoice):
+        iva_amount = (invoice.total * self.get_iva_rate(invoice.iva_type)) / 100
+        self.AgregarIva(invoice.iva_type, invoice.total, iva_amount)
+        self.EstablecerCampoFactura("imp_iva", iva_amount)
+        self.EstablecerCampoFactura("imp_total", invoice.total + iva_amount)
+
         
 def p_assert_eq(a,b):
     print a, a==b and '==' or '!=', b
@@ -1008,7 +1037,7 @@ def main():
 
         tipo_cbte = 6 if '--usados' not in sys.argv else 49
         punto_vta = 4001
-        cbte_nro = long(wsfev1.CompUltimoAutorizado(tipo_cbte, punto_vta) or 0)
+        cbte_nro = long(wsfev1.GetLastCMP(tipo_cbte, punto_vta) or 0)
         fecha = datetime.datetime.now().strftime("%Y%m%d")
         concepto = 2 if ('--usados' not in sys.argv and '--rg4109' not in sys.argv) else 1
         tipo_doc = 80 if '--usados' not in sys.argv else 30
@@ -1173,7 +1202,7 @@ def main():
     if "--get" in sys.argv:
         tipo_cbte = 2
         punto_vta = 4001
-        cbte_nro = wsfev1.CompUltimoAutorizado(tipo_cbte, punto_vta)
+        cbte_nro = wsfev1.GetLastCMP(tipo_cbte, punto_vta)
 
         wsfev1.CompConsultar(tipo_cbte, punto_vta, cbte_nro)
 

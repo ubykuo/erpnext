@@ -426,6 +426,10 @@ class BaseWS:
         else:
             return ""
 
+    def date_to_string(self, date):
+        """ returns a string representing date in AFIP format"""
+        return "".join(date.split("-")) if date else None
+
 
 class WebClient:
     "Minimal webservice client to do POST request with multipart encoded FORM data"
