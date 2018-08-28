@@ -289,6 +289,11 @@ def get_data():
 				},
 				{
 					"type": "doctype",
+					"name": "AFIP Settings",
+					"description": _("AFIP Settings")
+				},
+				{
+					"type": "doctype",
 					"name": "Fiscal Year",
 					"description": _("Financial / accounting year.")
 				},
