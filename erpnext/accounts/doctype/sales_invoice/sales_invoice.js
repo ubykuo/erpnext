@@ -38,9 +38,6 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 		if (this.frm.doc.docstatus != 1) {
 		    set_afip_required_fields(this.frm);
 		    load_invoice_types(this.frm);
-            load_invoice_concepts(this.frm);
-            load_iva_types(this.frm);
-            load_points_of_sale(this.frm);
 		}
 
 	},
@@ -614,7 +611,23 @@ frappe.ui.form.on('Sales Invoice', {
 	    change_service_dates_type(frm);
 	},
 	invoice_type: function (frm) {
-	    change_iva_type(frm);
+		var is_export_invoice = frm.doc.invoice_type == "19";
+		frm.toggle_reqd("export_type", is_export_invoice);
+		frm.set_df_property("export_type", "hidden", !is_export_invoice);
+
+		frm.toggle_reqd("concept", !is_export_invoice);
+		frm.set_df_property("concept", "hidden", is_export_invoice);
+
+		load_points_of_sale(this.frm);
+		if (is_export_invoice) {
+			load_export_types(frm);
+		}
+		else {
+			load_invoice_concepts(frm);
+			load_iva_types(frm);
+			change_iva_type(frm);
+		}
+
 	}
 })
 
@@ -699,7 +712,6 @@ var set_afip_required_fields = function (frm) {
     // set point_of_sale, invoice_type and concept fields as required
     frm.toggle_reqd("point_of_sale", frm.doc.authorize_afip);
     frm.toggle_reqd("invoice_type", frm.doc.authorize_afip);
-    frm.toggle_reqd("concept", frm.doc.authorize_afip);
 }
 
 var change_service_dates_type = function (frm) {
@@ -727,6 +739,9 @@ var set_field_default_value = function (frm, field, value) {
 var load_points_of_sale = function (frm) {
     frappe.call({
        method: "erpnext.accounts.doctype.sales_invoice.sales_invoice.get_points_of_sale",
+        args: {
+          "invoice_type": frm.doc.invoice_type
+        },
        callback: function (r) {
            if (r.message) {
               frm.set_df_property("point_of_sale", "options", r.message);
@@ -736,6 +751,19 @@ var load_points_of_sale = function (frm) {
        }
     });
 }
+
+var load_export_types = function (frm) {
+    frappe.call({
+       method: "erpnext.accounts.doctype.sales_invoice.sales_invoice.get_export_types",
+       callback: function (r) {
+           if (r.message) {
+              frm.set_df_property("export_types", "options", r.message);
+              frm.refresh_field("export_types");
+           }
+       }
+    });
+}
+
 
 
 
