@@ -1054,16 +1054,6 @@ def set_account_for_mode_of_payment(self):
             data.account = get_bank_cash_account(data.mode_of_payment, self.company).get("account")
 
 @frappe.whitelist()
-def get_invoice_types():
-    response = []
-    service = connect_afip("wsfe")
-    invoice_types = service.ParamGetTiposCbte()
-    for invoice_type in invoice_types:
-        invoice_type = invoice_type.split("|")
-        response.append({"value": invoice_type[0], "label": invoice_type[1]})
-    return response
-
-@frappe.whitelist()
 def get_invoice_concepts():
     response = []
     service = connect_afip("wsfe")
@@ -1084,14 +1074,36 @@ def get_iva_types():
     return response
 
 @frappe.whitelist()
-def get_points_of_sale():
+def get_points_of_sale(invoice_type):
     response = []
-    service = connect_afip("wsfe")
+    service_name = "wsfe" if invoice_type != "19" else "wsfex"
+    service = connect_afip(service_name)
     points_of_sale = service.ParamGetPtosVenta()
     for point_of_sale in points_of_sale:
         point_of_sale = point_of_sale.split("|")
         response.append({"value": point_of_sale[0], "label": point_of_sale[1] + " - " + point_of_sale[0]})
     return response
+
+@frappe.whitelist()
+def get_export_types():
+    response = []
+    service = connect_afip("wsfex")
+    export_types = service.GetParamTipoExpo()
+    for export_type in export_types:
+        export_type = export_type.split("|")
+        response.append({"value": export_type[0], "label": export_type[1] + " - " + export_type[0]})
+    return response
+
+@frappe.whitelist()
+def get_afip_settings():
+    afip_settings = frappe.get_doc("AFIP Settings", None)
+    return afip_settings.as_dict()
+
+
+
+
+
+
 
 
 
