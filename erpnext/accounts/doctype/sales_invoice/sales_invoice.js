@@ -611,7 +611,7 @@ frappe.ui.form.on('Sales Invoice', {
 	    change_service_dates_type(frm);
 	},
 	invoice_type: function (frm) {
-		var is_export_invoice = frm.doc.invoice_type == "19";
+		var is_export_invoice = frm.doc.invoice_type == frm.doc.afip_settings.export_invoice_code;
 		frm.toggle_reqd("export_type", is_export_invoice);
 		frm.set_df_property("export_type", "hidden", !is_export_invoice);
 
@@ -761,7 +761,7 @@ var load_export_types = function (frm) {
 
 var load_afip_settings = function (frm) {
     frappe.call({
-       method: "erpnext.accounts.doctype.sales_invoice.sales_invoice.get_afip_settings",
+       method: "erpnext.accounts.doctype.sales_invoice.sales_invoice.get_afip_settings_as_dict",
        callback: function (r) {
            if (r.message) {
                frm.doc.afip_settings = r.message;

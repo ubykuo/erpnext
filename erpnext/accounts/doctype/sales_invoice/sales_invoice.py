@@ -920,25 +920,25 @@ class SalesInvoice(SellingController):
     def get_company(self):
         return frappe.get_doc("Company", self.company)
 
-    def get_concept(self):
-        return frappe.get_doc("Invoice Concept", self.concept)
-
-    def get_invoice_type(self):
-        return frappe.get_doc("Invoice Type", self.invoice_type)
-
     def get_customer(self):
         return frappe.get_doc("Customer", self.customer)
 
     def get_currency(self):
         return frappe.get_doc("Currency", self.currency)
 
+    def get_customer_address(self):
+        return frappe.get_doc("Address", self.customer_address)
+
     def authorize_invoice(self):
-        for field in ("point_of_sale", "concept", "invoice_type"):
+        afip_settings = get_afip_settings()
+        for field in ("point_of_sale", "invoice_type"):
             if not self.get(field):
                 frappe.throw(_("{0} is mandatory").format(self.meta.get_label(field)))
-        self.validate_iva_type()
-        self.validate_concept()
-        self.validate_customer_id()
+
+        if not self.invoice_type == afip_settings.export_invoice_code:
+            self.validate_iva_type()
+            self.validate_concept()
+            self.validate_customer_id()
         authorize_invoice(self)
 
     def validate_iva_type(self):
@@ -1076,7 +1076,7 @@ def get_iva_types():
 @frappe.whitelist()
 def get_points_of_sale(invoice_type):
     response = []
-    service_name = "wsfe" if invoice_type != "19" else "wsfex"
+    service_name = "wsfe" if invoice_type != get_afip_settings().export_invoice_code else "wsfex"
     service = connect_afip(service_name)
     points_of_sale = service.ParamGetPtosVenta()
     for point_of_sale in points_of_sale:
@@ -1094,10 +1094,12 @@ def get_export_types():
         response.append({"value": export_type[0], "label": export_type[1] + " - " + export_type[0]})
     return response
 
-@frappe.whitelist()
 def get_afip_settings():
-    afip_settings = frappe.get_doc("AFIP Settings", None)
-    return afip_settings.as_dict()
+    return frappe.get_doc("AFIP Settings", None)
+
+@frappe.whitelist()
+def get_afip_settings_as_dict():
+    return get_afip_settings().as_dict()
 
 
 
