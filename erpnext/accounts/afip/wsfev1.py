@@ -946,7 +946,7 @@ class WSFEv1(BaseWS):
     def ParamGetPtosVenta(self, sep="|"):
         "Recuperador de valores referenciales Puntos de Venta registrados. En homologacion devuelve puntos de venta aleatorios"
         if self.HOMO:
-            return ["111|Facturacion Electronica", "222|Factura de Exportacion"]
+            return ["111|Facturacion Electronica"]
         ret = self.client.FEParamGetPtosVenta(
             Auth={'Token': self.Token, 'Sign': self.Sign, 'Cuit': self.Cuit},
             )
