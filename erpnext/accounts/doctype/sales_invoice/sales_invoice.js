@@ -36,8 +36,8 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 
         // Load invoice types, invoice concepts and iva types when creating a new invoice
 		if (this.frm.doc.docstatus != 1) {
+		    load_afip_settings(this.frm);
 		    set_afip_required_fields(this.frm);
-		    load_invoice_types(this.frm);
 		}
 
 	},
@@ -618,7 +618,7 @@ frappe.ui.form.on('Sales Invoice', {
 		frm.toggle_reqd("concept", !is_export_invoice);
 		frm.set_df_property("concept", "hidden", is_export_invoice);
 
-		load_points_of_sale(this.frm);
+		load_points_of_sale(frm);
 		if (is_export_invoice) {
 			load_export_types(frm);
 		}
@@ -669,17 +669,12 @@ var calculate_total_billing_amount =  function(frm) {
 }
 
 var load_invoice_types = function (frm) {
-    frappe.call({
-       method: "erpnext.accounts.doctype.sales_invoice.sales_invoice.get_invoice_types",
-       callback: function (r) {
-           if (r.message) {
-              frm.set_df_property("invoice_type", "options", r.message);
-              set_field_default_value(frm,"invoice_type", r.message[0].value);
-              frm.refresh_field("invoice_type");
-           }
-
-       }
+    var options = [];
+    $(frm.doc.afip_settings.invoice_types).each(function (i, invoice_type) {
+       options.push({"label": invoice_type.name, "value": invoice_type.code});
     });
+    frm.set_df_property("invoice_type", "options", options);
+    frm.refresh_field("invoice_type");
 }
 
 var load_invoice_concepts = function (frm) {
@@ -757,8 +752,20 @@ var load_export_types = function (frm) {
        method: "erpnext.accounts.doctype.sales_invoice.sales_invoice.get_export_types",
        callback: function (r) {
            if (r.message) {
-              frm.set_df_property("export_types", "options", r.message);
-              frm.refresh_field("export_types");
+              frm.set_df_property("export_type", "options", r.message);
+              frm.refresh_field("export_type");
+           }
+       }
+    });
+}
+
+var load_afip_settings = function (frm) {
+    frappe.call({
+       method: "erpnext.accounts.doctype.sales_invoice.sales_invoice.get_afip_settings",
+       callback: function (r) {
+           if (r.message) {
+               frm.doc.afip_settings = r.message;
+               load_invoice_types(frm);
            }
        }
     });
