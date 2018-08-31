@@ -382,7 +382,7 @@ class WSFEXv1(BaseWS):
             
             ret.append(r)
         if sep:
-            return [("\t%(codigo)s\t%(ds)s\t"
+            return [("%(codigo)s\t%(ds)s\t"
                       % it).replace("\t", sep) for it in ret]
         else:
             return ret
@@ -532,11 +532,10 @@ class WSFEXv1(BaseWS):
         incoterms = 'DAT'
         idioma_cbte = 2 # Ingles
         destino_comprobante = 203
-        cuit_pais_cliente = "50000000059"
         last_voucher_number = long(self.GetLastCMP(invoice.invoice_type, invoice.point_of_sale)) + 1
         self.CrearFactura(invoice.invoice_type, invoice.point_of_sale, last_voucher_number, self.date_to_string(invoice.posting_date),
                       invoice.grand_total, invoice.export_type,permiso_existente, destino_comprobante,
-                      invoice.get_customer().customer_name, cuit_pais_cliente,invoice.get_customer_address().address_line1,
+                      invoice.get_customer().customer_name, invoice.get_customer().id_type, invoice.get_customer_address().address_line1,
                     invoice.get_customer().id_number, invoice.get_currency().afip_code, exchange_rate,
                       obs_comerciales, obs, forma_pago, incoterms,
                       idioma_cbte, invoice.terms)
