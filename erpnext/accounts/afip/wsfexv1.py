@@ -525,20 +525,31 @@ class WSFEXv1(BaseWS):
 
     # UBYKUO - ERPNEXT
     def add_invoice(self, invoice, exchange_rate):
-        permiso_existente = None
+        permiso_existente = ''
         obs_comerciales = None
         obs = None
         forma_pago = None
         incoterms = 'DAT'
         idioma_cbte = 2 # Ingles
-        incoterms_ds = None
-        last_voucher_number = long(self.GetLastCMP(invoice.invoice_type, invoice.point_of_sale) or 0)
-        self.CrearFactura(invoice.invoice_type, invoice.point_of_sale, last_voucher_number, invoice.posting_date,
-                      invoice.grand_total, invoice.export_type,permiso_existente, dst_cmp,
-                      invoice.get_territory().afip_code, invoice.get_customer().id_number, invoice.get_customer_address().address_title,
-                      id_impositivo, invoice.get_currency().afip_code, exchange_rate,
+        destino_comprobante = 203
+        cuit_pais_cliente = "50000000059"
+        last_voucher_number = long(self.GetLastCMP(invoice.invoice_type, invoice.point_of_sale)) + 1
+        self.CrearFactura(invoice.invoice_type, invoice.point_of_sale, last_voucher_number, self.date_to_string(invoice.posting_date),
+                      invoice.grand_total, invoice.export_type,permiso_existente, destino_comprobante,
+                      invoice.get_customer().customer_name, cuit_pais_cliente,invoice.get_customer_address().address_line1,
+                    invoice.get_customer().id_number, invoice.get_currency().afip_code, exchange_rate,
                       obs_comerciales, obs, forma_pago, incoterms,
-                      idioma_cbte, incoterms_ds)
+                      idioma_cbte, invoice.terms)
+
+        for item in invoice.items:
+            self.AgregarItem(item.item_code, item.item_name, item.qty, 98, item.rate, item.amount)
+
+    def CAESolicitar(self):
+        last_id = long(self.GetLastID()) + 1
+        return self.Authorize(last_id)
+
+    def get_cae_due_date(self):
+        return datetime.datetime.strptime(self.Vencimiento, '%d/%m/%Y').date()
 
 
 

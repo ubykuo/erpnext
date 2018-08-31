@@ -42,9 +42,10 @@ def authorize_invoice (invoice):
     service.CAESolicitar()
     if service.Resultado == 'A':
         invoice.db_set("cae", service.CAE)
-        invoice.db_set("cae_due_date", datetime.datetime.strptime(service.Vencimiento, '%Y%m%d').date())
+        invoice.db_set("cae_due_date", service.get_cae_due_date())
     else:
-        frappe.throw(service.Obs)
+        frappe.throw(service.Obs + service.ErrMsg)
+
 
 
 

@@ -983,6 +983,9 @@ class WSFEv1(BaseWS):
         self.EstablecerCampoFactura("imp_iva", iva_amount)
         self.EstablecerCampoFactura("imp_total", invoice.total + iva_amount)
 
+    def get_cae_due_date(self):
+        return datetime.datetime.strptime(self.Vencimiento, '%Y%m%d').date()
+
         
 def p_assert_eq(a,b):
     print a, a==b and '==' or '!=', b
