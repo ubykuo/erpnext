@@ -608,25 +608,10 @@ frappe.ui.form.on('Sales Invoice', {
 	},
 
 	concept: function (frm) {
-	    change_service_dates_type(frm);
+	    change_service_dates_condition(frm);
 	},
 	invoice_type: function (frm) {
-		var is_export_invoice = frm.doc.invoice_type == frm.doc.afip_settings.export_invoice_code;
-		frm.toggle_reqd("export_type", is_export_invoice);
-		frm.set_df_property("export_type", "hidden", !is_export_invoice);
-
-		frm.toggle_reqd("concept", !is_export_invoice);
-		frm.set_df_property("concept", "hidden", is_export_invoice);
-
-		load_points_of_sale(frm);
-		if (is_export_invoice) {
-			load_export_types(frm);
-		}
-		else {
-			load_invoice_concepts(frm);
-			load_iva_types(frm);
-			change_iva_type(frm);
-		}
+		set_up_invoice_type(frm);
 
 	}
 })
@@ -709,7 +694,7 @@ var set_afip_required_fields = function (frm) {
     frm.toggle_reqd("invoice_type", frm.doc.authorize_afip);
 }
 
-var change_service_dates_type = function (frm) {
+var change_service_dates_condition = function (frm) {
     var required_dates = frm.doc.concept == "2" || frm.doc.concept == "3";
     frm.toggle_reqd("service_start_date",required_dates);
     frm.set_df_property("service_start_date", "hidden", !required_dates);
@@ -717,7 +702,7 @@ var change_service_dates_type = function (frm) {
     frm.set_df_property("service_end_date", "hidden", !required_dates);
 }
 
-var change_iva_type = function (frm) {
+var change_iva_type_condition = function (frm) {
     var required_iva = frm.doc.invoice_type == "1" || frm.doc.invoice_type == "6";
     frm.toggle_reqd("iva_type",required_iva);
     frm.set_df_property("iva_type", "hidden", !required_iva);
@@ -740,8 +725,7 @@ var load_points_of_sale = function (frm) {
        callback: function (r) {
            if (r.message) {
               frm.set_df_property("point_of_sale", "options", r.message);
-              set_field_default_value(frm,"point_of_sale", r.message[0].value);
-              frm.refresh_field("point_of_sale");
+              frm.set_value("point_of_sale", r.message[0].value);
            }
        }
     });
@@ -766,9 +750,33 @@ var load_afip_settings = function (frm) {
            if (r.message) {
                frm.doc.afip_settings = r.message;
                load_invoice_types(frm);
+                if (frm.doc.invoice_type) {
+                    set_up_invoice_type(frm);
+                }
            }
        }
     });
+}
+
+var set_up_invoice_type = function (frm) {
+	var is_export_invoice = frm.doc.invoice_type == frm.doc.afip_settings.export_invoice_code;
+	frm.toggle_reqd("export_type", is_export_invoice);
+	frm.set_df_property("export_type", "hidden", !is_export_invoice);
+
+	frm.toggle_reqd("concept", !is_export_invoice);
+	frm.set_df_property("concept", "hidden", is_export_invoice);
+
+	load_points_of_sale(frm);
+	change_iva_type_condition(frm);
+	if (is_export_invoice) {
+	    frm.set_value("concept", null);
+	    load_export_types(frm);
+	}
+	else {
+	    frm.set_value("export_type", null);
+	    load_invoice_concepts(frm);
+	    load_iva_types(frm);
+	}
 }
 
 
