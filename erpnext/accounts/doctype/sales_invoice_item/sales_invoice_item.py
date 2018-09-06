@@ -8,5 +8,8 @@ from frappe.model.document import Document
 from erpnext.controllers.print_settings import print_settings_for_item_table
 
 class SalesInvoiceItem(Document):
-	def __setup__(self):
-		print_settings_for_item_table(self)
+    def __setup__(self):
+        print_settings_for_item_table(self)
+
+    def get_uom(self):
+        return frappe.get_doc("UOM", self.uom)

@@ -956,7 +956,7 @@ class WSFEv1(BaseWS):
 
     # UBYKUO ERPNEXT
 
-    def add_invoice(self, invoice, exchange_rate):
+    def add_invoice(self, invoice, exchange_rate, afip_settings):
         last_voucher_number = long (self.GetLastCMP(invoice.invoice_type, invoice.point_of_sale) or 0)
         self.CrearFactura(invoice.concept, invoice.get_customer().id_type, invoice.get_customer().id_number,
                              invoice.invoice_type, invoice.point_of_sale, last_voucher_number + 1,

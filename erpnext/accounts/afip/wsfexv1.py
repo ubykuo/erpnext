@@ -524,7 +524,7 @@ class WSFEXv1(BaseWS):
                  for r in ret]
 
     # UBYKUO - ERPNEXT
-    def add_invoice(self, invoice, exchange_rate):
+    def add_invoice(self, invoice, exchange_rate, afip_settings):
         permiso_existente = ''
         obs_comerciales = None
         obs = None
@@ -541,7 +541,8 @@ class WSFEXv1(BaseWS):
                       idioma_cbte, invoice.terms)
 
         for item in invoice.items:
-            self.AgregarItem(item.item_code, item.item_name, item.qty, 98, item.rate, item.amount)
+            item_uom_code = item.get_uom().afip_code
+            self.AgregarItem(item.item_code, item.item_name, item.qty, item_uom_code if item_uom_code else afip_settings.default_uom, item.rate, item.amount)
 
     def CAESolicitar(self):
         last_id = long(self.GetLastID()) + 1

@@ -39,7 +39,7 @@ def authorize_invoice (invoice):
     except KeyError as e:
         frappe.throw(_("Invalid Currency, Check AFIP code"))
 
-    service.add_invoice(invoice, exchange_rate)
+    service.add_invoice(invoice, exchange_rate, afip_settings)
     service.CAESolicitar()
     if service.Resultado == 'A':
         invoice.db_set("cae", service.CAE)
