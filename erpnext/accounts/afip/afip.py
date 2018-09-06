@@ -30,7 +30,8 @@ def connect_afip(service_name, company=None):
 
 
 def authorize_invoice (invoice):
-    service_name = "wsfex" if invoice.invoice_type == "19" else "wsfe"
+    afip_settings = frappe.get_doc("AFIP Settings", None)
+    service_name = "wsfex" if invoice.invoice_type == afip_settings.export_invoice_code else "wsfe"
     service = connect_afip(service_name, invoice.get_company())
 
     try:
