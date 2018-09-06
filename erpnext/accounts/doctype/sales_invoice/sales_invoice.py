@@ -935,11 +935,24 @@ class SalesInvoice(SellingController):
             if not self.get(field):
                 frappe.throw(_("{0} is mandatory").format(self.meta.get_label(field)))
 
+        self.validate_invoice_type(afip_settings)
+        self.validate_point_of_sale()
+        self.validate_customer_id()
         if not self.invoice_type == afip_settings.export_invoice_code:
             self.validate_iva_type()
             self.validate_concept()
-            self.validate_customer_id()
+        else:
+            self.validate_customer_address()
+            self.validate_export_type()
         authorize_invoice(self)
+
+    def validate_invoice_type(self, afip_settings):
+        if not filter(lambda invoice_type: invoice_type.code == self.invoice_type, afip_settings.invoice_types):
+            frappe.throw(_("Invalid {0}").format("Invoice Type"))
+
+    def validate_point_of_sale(self):
+        if not filter(lambda point_of_sale: point_of_sale["value"] == self.point_of_sale, get_points_of_sale(self.invoice_type)):
+            frappe.throw(_("Invalid {0}").format("Point of Sale"))
 
     def validate_iva_type(self):
         """
@@ -970,7 +983,13 @@ class SalesInvoice(SellingController):
         if not self.get_customer().id_type or not self.get_customer().id_number:
             frappe.throw(_("ID type and ID number of customer are required"))
 
+    def validate_customer_address(self):
+        if not self.customer_address:
+            frappe.throw(_("Customer address is mandatory to authorize Export Invoice"))
 
+    def validate_export_type(self):
+        if not filter(lambda export_type: export_type["value"] == self.export_type, get_export_types()):
+            frappe.throw(_("Invalid {0}").format("Export Type"))
 
 def get_list_context(context=None):
     from erpnext.controllers.website_list_for_contact import get_list_context
