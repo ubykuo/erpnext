@@ -958,11 +958,12 @@ class WSFEv1(BaseWS):
 
     def add_invoice(self, invoice, exchange_rate, afip_settings):
         last_voucher_number = long (self.GetLastCMP(invoice.invoice_type, invoice.point_of_sale) or 0)
+        payment_due_date = self.date_to_string(invoice.due_date) if invoice.concept in ("2", "3") else None
         self.CrearFactura(invoice.concept, invoice.get_customer().id_type, invoice.get_customer().id_number,
                              invoice.invoice_type, invoice.point_of_sale, last_voucher_number + 1,
                              last_voucher_number + 1,
                              invoice.grand_total, 0, invoice.total,
-                             0, 0, 0, self.date_to_string(invoice.posting_date), self.date_to_string(invoice.due_date),
+                             0, 0, 0, self.date_to_string(invoice.posting_date), payment_due_date,
                              self.date_to_string(invoice.service_start_date), self.date_to_string(invoice.service_end_date),
                              invoice.get_currency().afip_code, exchange_rate)
 
