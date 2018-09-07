@@ -937,7 +937,7 @@ class SalesInvoice(SellingController):
 
         self.validate_invoice_type(afip_settings)
         self.validate_point_of_sale()
-        self.validate_customer_id()
+        self.validate_customer_id(afip_settings)
         if not self.invoice_type == afip_settings.export_invoice_code:
             self.validate_iva_type()
             self.validate_concept()
@@ -979,9 +979,15 @@ class SalesInvoice(SellingController):
                 if not self.get(field):
                     frappe.throw(_("{0} is required when concept include Services").format(self.meta.get_label(field)))
 
-    def validate_customer_id(self):
-        if not self.get_customer().id_type or not self.get_customer().id_number:
-            frappe.throw(_("ID type and ID number of customer are required"))
+    def validate_customer_id(self, afip_settings):
+        """ In export invoices only one of the two fields are required.
+        In local invoices, both fields are required"""
+        if self.invoice_type == afip_settings.export_invoice_code:
+            if not (self.get_customer().id_type or self.get_customer().id_number):
+                frappe.throw(_("ID type or ID number of customer are mandatory to authorize Export Invoice"))
+        else:
+            if not (self.get_customer().id_type and self.get_customer().id_number):
+                frappe.throw(_("ID type and ID number of customer are mandatory"))
 
     def validate_customer_address(self):
         if not self.customer_address:
