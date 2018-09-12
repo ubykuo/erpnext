@@ -531,10 +531,9 @@ class WSFEXv1(BaseWS):
         forma_pago = None
         incoterms = 'DAT'
         idioma_cbte = 2 # Ingles
-        destino_comprobante = 203
         last_voucher_number = long(self.GetLastCMP(invoice.invoice_type, invoice.point_of_sale)) + 1
         self.CrearFactura(invoice.invoice_type, invoice.point_of_sale, last_voucher_number, self.date_to_string(invoice.posting_date),
-                      invoice.grand_total, invoice.export_type,permiso_existente, destino_comprobante,
+                      invoice.grand_total, invoice.export_type,permiso_existente, invoice.get_customer_address().get_country().afip_code,
                       invoice.get_customer().customer_name, invoice.get_customer().id_type, invoice.get_customer_address().address_line1,
                     invoice.get_customer().id_number, invoice.get_currency().afip_code, exchange_rate,
                       obs_comerciales, obs, forma_pago, incoterms,

@@ -993,6 +993,9 @@ class SalesInvoice(SellingController):
         if not self.customer_address:
             frappe.throw(_("Customer address is mandatory to authorize Export Invoice"))
 
+        if not self.get_customer_address().get_country().afip_code:
+            frappe.throw(_("AFIP Code of target country is mandatory"))
+
     def validate_export_type(self):
         if not filter(lambda export_type: export_type["value"] == self.export_type, get_export_types()):
             frappe.throw(_("Invalid {0}").format("Export Type"))
