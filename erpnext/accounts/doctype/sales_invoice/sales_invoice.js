@@ -613,7 +613,13 @@ frappe.ui.form.on('Sales Invoice', {
 	invoice_type: function (frm) {
 		set_up_invoice_type(frm);
 
-	}
+	},
+
+	address_display: function (frm) {
+		// last string of address display field is the name of the country.
+        var address = frm.doc.address_display.split("<br>");
+		frm.set_value("export_country", address[address.length - 2]);
+    }
 })
 
 frappe.ui.form.on('Sales Invoice Timesheet', {
