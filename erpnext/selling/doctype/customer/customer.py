@@ -186,6 +186,9 @@ class Customer(TransactionBase):
     def get_id_type(self):
         return frappe.get_doc("Identification Type", self.id_type)
 
+    def get_language(self):
+        return frappe.get_doc("Language", self.language)
+
 
 def get_customer_list(doctype, txt, searchfield, start, page_len, filters):
     if frappe.db.get_default("cust_master_name") == "Customer Name":
