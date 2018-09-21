@@ -34,9 +34,7 @@ frappe.ui.form.on("Customer", {
 			}
 		})
 	},
-	onload: function (frm) {
-	    load_id_types(frm);
-	},
+
 	customer_primary_contact: function(frm){
 		if(!frm.doc.customer_primary_contact){
 			frm.set_value("mobile_no", "");
@@ -83,19 +81,3 @@ frappe.ui.form.on("Customer", {
 	},
 });
 
-/**
-    load id types from AFIP service
-*/
-var load_id_types = function (frm) {
-    frappe.call({
-       method: "erpnext.selling.doctype.customer.customer.get_id_types",
-       callback: function (r) {
-           debugger;
-           if (r.message) {
-              frm.set_df_property("id_type", "options", r.message);
-              frm.refresh_field("id_type");
-           }
-
-       }
-    });
-}

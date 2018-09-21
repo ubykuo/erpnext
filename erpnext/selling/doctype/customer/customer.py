@@ -335,14 +335,5 @@ def get_customer_primary_contact(doctype, txt, searchfield, start, page_len, fil
             'txt': '%%%s%%' % txt
         })
 
-@frappe.whitelist()
-def get_id_types():
-    response = []
-    service = connect_afip("wsfe")
-    id_types = service.ParamGetTiposDoc()
-    id_types += connect_afip("wsfex").GetParamDstCUIT()
-    for id_type in id_types:
-        id_type = id_type.split("|")
-        response.append({"value": id_type[0], "label": id_type[1]})
-    return response
+
 
