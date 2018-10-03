@@ -219,6 +219,7 @@ class BaseWS:
         self.inicializar()
         self.Token = self.Sign = ""
         self.LanzarExcepciones = True
+        self.ExpiracionTicketAcceso = None
     
     def inicializar(self):
         self.Excepcion = self.Traceback = ""
@@ -385,9 +386,13 @@ class BaseWS:
             ta = SimpleXMLElement(ta_string)
             self.Token = str(ta.credentials.token)
             self.Sign = str(ta.credentials.sign)
+            self.ExpiracionTicketAcceso = datetime.datetime.strptime(str(ta.header.expirationTime)[:19],'%Y-%m-%dT%H:%M:%S')
             return True
         else:
             raise RuntimeError("Ticket de Acceso vacio!")
+
+    def TicketAcessoExpirado(self):
+        return (self.ExpiracionTicketAcceso and datetime.datetime.now() > self.ExpiracionTicketAcceso)
 
     def SetParametro(self, clave, valor):
         "Establece un parámetro de entrada (a usarse en llamada posterior)"
