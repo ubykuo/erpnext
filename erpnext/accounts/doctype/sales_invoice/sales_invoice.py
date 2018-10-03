@@ -929,16 +929,22 @@ class SalesInvoice(SellingController):
     def get_customer_address(self):
         return frappe.get_doc("Address", self.customer_address)
 
+
+    def is_export_invoice(self):
+        afip_settings = get_afip_settings()
+        return self.invoice_type == afip_settings.export_invoice_code
+
+
     def authorize_invoice(self):
         afip_settings = get_afip_settings()
         for field in ("point_of_sale", "invoice_type"):
             if not self.get(field):
                 frappe.throw(_("{0} is mandatory").format(self.meta.get_label(field)))
 
-        self.validate_invoice_type(afip_settings)
+        self.validate_invoice_type()
         self.validate_point_of_sale()
-        self.validate_customer_id(afip_settings)
-        if not self.invoice_type == afip_settings.export_invoice_code:
+        self.validate_customer_id()
+        if not self.is_export_invoice():
             self.validate_iva_type()
             self.validate_concept()
         else:
@@ -946,12 +952,12 @@ class SalesInvoice(SellingController):
             self.validate_export_type()
         authorize_invoice(self)
 
-    def validate_invoice_type(self, afip_settings):
-        if not filter(lambda invoice_type: invoice_type.code == self.invoice_type, afip_settings.invoice_types):
+    def validate_invoice_type(self):
+        if not filter(lambda invoice_type: invoice_type.code == self.invoice_type, get_afip_settings().invoice_types):
             frappe.throw(_("Invalid {0}").format("Invoice Type"))
 
     def validate_point_of_sale(self):
-        if not filter(lambda point_of_sale: point_of_sale["value"] == self.point_of_sale, get_points_of_sale(self.invoice_type)):
+        if not filter(lambda point_of_sale: point_of_sale["value"] == self.point_of_sale, get_points_of_sale(self.get_afip_service())):
             frappe.throw(_("Invalid {0}").format("Point of Sale"))
 
     def validate_iva_type(self):
@@ -971,7 +977,7 @@ class SalesInvoice(SellingController):
         If concept is 2 or 3, service start date, service end date and payment due date are required
         :return:
         """
-        selected_concept = filter(lambda c: c["value"] == self.concept, get_invoice_concepts())
+        selected_concept = filter(lambda c: c["value"] == self.concept, get_invoice_concepts(self.get_afip_service()))
         if not selected_concept:
             frappe.throw(_("Invalid {0}".format(self.meta.get_label("concept"))))
         if self.concept in ("2", "3"):
@@ -979,10 +985,10 @@ class SalesInvoice(SellingController):
                 if not self.get(field):
                     frappe.throw(_("{0} is required when concept include Services").format(self.meta.get_label(field)))
 
-    def validate_customer_id(self, afip_settings):
+    def validate_customer_id(self):
         """ In export invoices only one of the two fields are required.
         In local invoices, both fields are required"""
-        if self.invoice_type == afip_settings.export_invoice_code:
+        if self.is_export_invoice():
             if not (self.get_customer().id_type or self.get_customer().id_number):
                 frappe.throw(_("ID type or ID number of customer are mandatory to authorize Export Invoice"))
         else:
@@ -997,8 +1003,11 @@ class SalesInvoice(SellingController):
             frappe.throw(_("AFIP Code of target country is mandatory"))
 
     def validate_export_type(self):
-        if not filter(lambda export_type: export_type["value"] == self.export_type, get_export_types()):
+        if not filter(lambda export_type: export_type["value"] == self.export_type, get_export_types(self.get_afip_service())):
             frappe.throw(_("Invalid {0}").format("Export Type"))
+
+    def get_afip_service(self):
+        return connect_afip("wsfex") if self.is_export_invoice() else connect_afip("wsfe")
 
 def get_list_context(context=None):
     from erpnext.controllers.website_list_for_contact import get_list_context
@@ -1094,9 +1103,10 @@ def get_iva_types(service):
     iva_types = service.ParamGetTiposIva()
     for iva_type in iva_types:
         iva_type = iva_type.split("|")
-        response.append()
+        response.append({"value": iva_type[0], "label": iva_type[1]})
+    return response
 
-def get_points_of_sale(service, invoice_type):
+def get_points_of_sale(service):
     response = []
     points_of_sale = service.ParamGetPtosVenta()
     for point_of_sale in points_of_sale:
@@ -1123,10 +1133,10 @@ def get_afip_settings_as_dict():
 def setup_invoice_type(invoice_type):
     if invoice_type == get_afip_settings().export_invoice_code:
         service = connect_afip("wsfex")
-        return {"points_of_sale": get_points_of_sale(service, invoice_type), "export_types": get_export_types(service)}
+        return {"points_of_sale": get_points_of_sale(service), "export_types": get_export_types(service)}
     else:
         service = connect_afip("wsfe")
-        return {"points_of_sale": get_points_of_sale(service, invoice_type), "concepts": get_invoice_concepts(service), "iva_types": get_iva_types(service)}
+        return {"points_of_sale": get_points_of_sale(service), "concepts": get_invoice_concepts(service), "iva_types": get_iva_types(service)}
 
 
 
