@@ -668,30 +668,16 @@ var load_invoice_types = function (frm) {
     frm.refresh_field("invoice_type");
 }
 
-var load_invoice_concepts = function (frm) {
-    frappe.call({
-       method: "erpnext.accounts.doctype.sales_invoice.sales_invoice.get_invoice_concepts",
-       callback: function (r) {
-           if (r.message) {
-              frm.set_df_property("concept", "options", r.message);
-              set_field_default_value(frm, "concept", 2);
-              frm.refresh_field("concept");
-           }
-       }
-    });
+var load_invoice_concepts = function (frm, concepts) {
+    frm.set_df_property("concept", "options", concepts);
+    set_field_default_value(frm, "concept", 2);
+    frm.refresh_field("concept");
 }
 
-var load_iva_types = function (frm) {
-   frappe.call({
-       method: "erpnext.accounts.doctype.sales_invoice.sales_invoice.get_iva_types",
-       callback: function (r) {
-           if (r.message) {
-              frm.set_df_property("iva_type", "options", r.message);
-              set_field_default_value(frm, "iva_type", 5);
-              frm.refresh_field("iva_type");
-           }
-       }
-    });
+var load_iva_types = function (frm, iva_types) {
+    frm.set_df_property("iva_type", "options", iva_types);
+    set_field_default_value(frm, "iva_type", 5);
+    frm.refresh_field("iva_type");
 }
 
 var set_afip_required_fields = function (frm) {
@@ -722,31 +708,14 @@ var set_field_default_value = function (frm, field, value) {
     }
 }
 
-var load_points_of_sale = function (frm) {
-    frappe.call({
-       method: "erpnext.accounts.doctype.sales_invoice.sales_invoice.get_points_of_sale",
-        args: {
-          "invoice_type": frm.doc.invoice_type
-        },
-       callback: function (r) {
-           if (r.message) {
-              frm.set_df_property("point_of_sale", "options", r.message);
-              frm.set_value("point_of_sale", r.message[0].value);
-           }
-       }
-    });
+var load_points_of_sale = function (frm, points_of_sale) {
+    frm.set_df_property("point_of_sale", "options", []);
+    frm.set_df_property("point_of_sale", "options", points_of_sale);
+    frm.set_value("point_of_sale", points_of_sale[0].value);
 }
 
-var load_export_types = function (frm) {
-    frappe.call({
-       method: "erpnext.accounts.doctype.sales_invoice.sales_invoice.get_export_types",
-       callback: function (r) {
-           if (r.message) {
-              frm.set_df_property("export_type", "options", r.message);
-              frm.refresh_field("export_type");
-           }
-       }
-    });
+var load_export_types = function (frm, export_types) {
+    frm.set_df_property("export_type", "options", export_types);
 }
 
 var load_afip_settings = function (frm) {
@@ -771,18 +740,30 @@ var set_up_invoice_type = function (frm) {
 
 	frm.toggle_reqd("concept", !is_export_invoice);
 	frm.set_df_property("concept", "hidden", is_export_invoice);
-
-	load_points_of_sale(frm);
 	change_iva_type_condition(frm);
-	if (is_export_invoice) {
-	    frm.set_value("concept", null);
-	    load_export_types(frm);
-	}
-	else {
-	    frm.set_value("export_type", null);
-	    load_invoice_concepts(frm);
-	    load_iva_types(frm);
-	}
+
+	frappe.call({
+       method: "erpnext.accounts.doctype.sales_invoice.sales_invoice.setup_invoice_type",
+        args: {
+          "invoice_type": frm.doc.invoice_type
+        },
+       callback: function (r) {
+           console.log(r.message);
+           if (r.message) {
+               load_points_of_sale(frm, r.message.points_of_sale);
+               if (is_export_invoice) {
+                   frm.set_value("concept", null);
+                   load_export_types(frm, r.message.export_types);
+               }
+               else {
+                   frm.set_value("export_type", null);
+                   frm.set_value("export_country", null);
+                   load_invoice_concepts(frm, r.message.concepts);
+                   load_iva_types(frm, r.message.iva_types);
+               }
+           }
+       }
+    });
 }
 
 

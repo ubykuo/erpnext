@@ -1081,41 +1081,31 @@ def set_account_for_mode_of_payment(self):
         if not data.account:
             data.account = get_bank_cash_account(data.mode_of_payment, self.company).get("account")
 
-@frappe.whitelist()
-def get_invoice_concepts():
+def get_invoice_concepts(service):
     response = []
-    service = connect_afip("wsfe")
     invoice_concepts = service.ParamGetTiposConcepto()
     for concept in invoice_concepts:
         concept = concept.split("|")
         response.append({"value": concept[0], "label": concept[1]})
     return response
 
-@frappe.whitelist()
-def get_iva_types():
+def get_iva_types(service):
     response = []
-    service = connect_afip("wsfe")
     iva_types = service.ParamGetTiposIva()
     for iva_type in iva_types:
         iva_type = iva_type.split("|")
-        response.append({"value": iva_type[0], "label": iva_type[1]})
-    return response
+        response.append()
 
-@frappe.whitelist()
-def get_points_of_sale(invoice_type):
+def get_points_of_sale(service, invoice_type):
     response = []
-    service_name = "wsfe" if invoice_type != get_afip_settings().export_invoice_code else "wsfex"
-    service = connect_afip(service_name)
     points_of_sale = service.ParamGetPtosVenta()
     for point_of_sale in points_of_sale:
         point_of_sale = point_of_sale.split("|")
         response.append({"value": point_of_sale[0], "label": point_of_sale[1] + " - " + point_of_sale[0]})
     return response
 
-@frappe.whitelist()
-def get_export_types():
+def get_export_types(service):
     response = []
-    service = connect_afip("wsfex")
     export_types = service.GetParamTipoExpo()
     for export_type in export_types:
         export_type = export_type.split("|")
@@ -1128,6 +1118,16 @@ def get_afip_settings():
 @frappe.whitelist()
 def get_afip_settings_as_dict():
     return get_afip_settings().as_dict()
+
+@frappe.whitelist()
+def setup_invoice_type(invoice_type):
+    if invoice_type == get_afip_settings().export_invoice_code:
+        service = connect_afip("wsfex")
+        return {"points_of_sale": get_points_of_sale(service, invoice_type), "export_types": get_export_types(service)}
+    else:
+        service = connect_afip("wsfe")
+        return {"points_of_sale": get_points_of_sale(service, invoice_type), "concepts": get_invoice_concepts(service), "iva_types": get_iva_types(service)}
+
 
 
 
