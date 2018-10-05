@@ -1,0 +1,137 @@
+{% set company = frappe.get_doc("Company", doc.company) %}
+{% set afip_settings = frappe.get_doc("AFIP Settings", None) %}
+
+<style>
+    .bold {
+        font-weight: bold;
+    }
+</style>
+
+<div class="row">
+    <div class="col-md-6">
+        <h1>{{ doc.company }}</h1>
+        <p><span class="bold">Razon Social: </span></p>
+        <p><span class="bold">Domicilio Comercial</span></p>
+        <p><span class="bold">Condicion frente al IVA: </span></p>
+    </div>
+
+    <div class="col-md-6">
+        {% if doc.invoice_type == afip_settings.export_invoice_code %}
+            <h5>FACTURA DE EXPORTACION</h5>
+        {% else %}
+            <h5>FACTURA</h5>
+        {% endif %}
+        <p class="bold">Compr. Nro:</p>
+        <p class="bold">Fecha de Emision: {{ doc.posting_date }}</p>
+        <p><span class="bold">CUIT: {{ company.cuit }}</span></p>
+        <p><span class="bold">Ingresos Brutos:</span></p>
+        <p><span class="bold">Fecha de Inicio de Actividades:</span></p>
+        {% if doc.invoice_type == afip_settings.export_invoice_code %}
+            <p class="bold">IVA EXENTO OPERACION DE EXPORTACION</p>
+        {% endif %}
+    </div>
+</div>
+
+{% if doc.concept in ("2", "3") %}
+<div class="row" style="margin-top: 20px">
+    <div class="col-md-4">
+        <p><span class="bold">Periodo Facturado Desde: </span>{{ doc.service_start_date }}</p>
+    </div>
+    <div class="col-md-3">
+        <p><span class="bold">Hasta: </span>{{ doc.service_end_date }}</p>
+    </div>
+    <div class="col-md-5">
+        <p><span class="bold">Fecha de Vto de pago: </span>{{ doc.due_date }}</p>
+    </div>
+</div>
+{% endif %}
+
+{% if doc.invoice_type != afip_settings.export_invoice_code %}
+    <div class="row" style="margin-top: 20px">
+        <div class="col-md-6">
+            <p><span class="bold">{{ doc.get_customer().get_id_type().id_name }}: </span>{{doc.get_customer().id_number }}</p>
+            <p><span class="bold">Condicion frente al IVA:</span> </p>
+            <p><span class="bold">Condicion de venta:</span> </p>
+        </div>
+        <div class="col-md-6">
+            <p><span class="bold">Apellido y Nombre / Razon Social: </span>{{ doc.get_customer().customer_name }}</p>
+            <p><span class="bold">Domicilio Comercial: </span></p>
+        </div>
+    </div>
+
+{% else %}
+    <div class="row" style="margin-top: 20px">
+        <div class="col-md-5">
+            <p><span class="bold">Se&ntilde;or(es): </span>{{ doc.get_customer().customer_name }}</p>
+            <p><span class="bold">CUIT Pais: </span>{{ doc.get_customer().get_id_type().id_name }}</p>
+            <p><span class="bold">ID Impositivo: </span>{{doc.get_customer().id_number }}</p>
+        </div>
+        <div class="col-md-5">
+            <p><span class="bold">Domicilio: </span> </p>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top: 20px">
+        <div class="col-md-5">
+            <p><span class="bold">Divisa: </span>{{ doc.get_currency().currency_name }}</p>
+            <p><span class="bold">Destino Comprobante: </span>{{ doc.export_country }}</p>
+        </div>
+    </div>
+
+{% endif %}
+<div class="row" style="margin-top: 20px">
+    <table class="table">
+        <thead class="thead-light">
+            <tr>
+              <th scope="col">Codigo</th>
+              <th scope="col">Producto</th>
+              <th scope="col">Cantidad</th>
+              <th scope="col">Precio Unitario ({{ doc.get_currency().currency_name }})</th>
+                <th scope="col">Subtotal ({{ doc.get_currency().currency_name }})</th>
+                {% if doc.invoice_type != afip_settings.export_invoice_code %}
+                    <th>Alicuota IVA</th>
+                    <th>Subtotal c/IVA</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td></td>
+                <td>Sprint 1</td>
+                <td>1.00</td>
+                <td>{{ doc.grand_total }}</td>
+                <td>{{ doc.grand_total }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<div class="row" style="margin-top: 20px">
+     {% if doc.invoice_type == afip_settings.export_invoice_code %}
+        <div class="col-md-4">
+            <p><span class="bold">Tipo de cambio: {{ doc.conversion_rate }}</span></p>
+        </div>
+        <div class="col-md-offset-4 col-md-4">
+            <p><span class="bold">Divisa:</span> </p>
+            <p><span class="bold">Importe Total: {{ doc.get_currency().currency_name }} {{ doc.grand_total}}</span></p>
+        </div>
+    {% else %}
+        <!-- Tipos de IVA -->
+        <div class="col-md-4">
+        </div>
+        <div class="col-md-offset-4 col-md-4">
+            <p><span class="bold">Importe Total: {{ doc.get_currency().symbol }}{{ doc.grand_total}}</span></p>
+        </div>
+    {% endif %}
+
+</div>
+
+<div class="row" style="margin-top: 20px">
+    <div class="col-md-4 col-md-offset-8">
+        <p><span class="bold">CAE: </span>{{ doc.cae }}</p>
+        <p><span class="bold">Fecha de Vto de CAE: </span>{{ doc.cae_due_date }}</p>
+    </div>
+</div>
+
+
