@@ -1099,12 +1099,7 @@ def get_invoice_concepts(service):
     return response
 
 def get_iva_types(service):
-    response = []
-    iva_types = service.ParamGetTiposIva()
-    for iva_type in iva_types:
-        iva_type = iva_type.split("|")
-        response.append({"value": iva_type[0], "label": iva_type[1]})
-    return response
+    return [{"value": iva_type["id"], "label": iva_type["descripcion"]} for iva_type in service.ParamGetTiposIva()]
 
 def get_points_of_sale(service):
     response = []

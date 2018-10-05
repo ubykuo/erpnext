@@ -884,8 +884,8 @@ class WSFEv1(BaseWS):
             Auth={'Token': self.Token, 'Sign': self.Sign, 'Cuit': self.Cuit},
             )
         res = ret['FEParamGetTiposIvaResult']
-        return [(u"%(Id)s\t%(Desc)s\t%(FchDesde)s\t%(FchHasta)s" % p['IvaTipo']).replace("\t", sep)
-                 for p in res['ResultGet']]
+        return [{"id": iva['IvaTipo']['Id'], "descripcion": iva["IvaTipo"]['Desc'],
+                 "value": float(iva["IvaTipo"]['Desc'][:-1])} for iva in res['ResultGet']]
 
     @inicializar_y_capturar_excepciones
     def ParamGetTiposMonedas(self, sep="|"):
@@ -970,16 +970,12 @@ class WSFEv1(BaseWS):
         if invoice.invoice_type in ("1", "6"):  # Factura A or B
             self.add_iva(invoice)
 
-    def get_iva_rate(self, iva_code):
-        all_iva_types = self.ParamGetTiposIva()
-        selected_iva = filter(lambda i: i.split("|")[0] == iva_code, all_iva_types)
-        if not selected_iva:
-            return None
-        selected_iva = selected_iva[0].split("|")
-        return float(selected_iva[1][:-1])  # remove % character
+    def get_iva(self, iva_code):
+        selected_iva = filter(lambda i: i["id"] == iva_code, self.ParamGetTiposIva())
+        return selected_iva[0] if selected_iva else None
 
     def add_iva(self, invoice):
-        iva_amount = (invoice.total * self.get_iva_rate(invoice.iva_type)) / 100
+        iva_amount = (invoice.total * self.get_iva(invoice.iva_type).get("value")) / 100
         self.AgregarIva(invoice.iva_type, invoice.total, iva_amount)
         self.EstablecerCampoFactura("imp_iva", iva_amount)
         self.EstablecerCampoFactura("imp_total", invoice.total + iva_amount)
