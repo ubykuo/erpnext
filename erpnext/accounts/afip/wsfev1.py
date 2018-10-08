@@ -970,15 +970,11 @@ class WSFEv1(BaseWS):
         if invoice.invoice_type in ("1", "6"):  # Factura A or B
             self.add_iva(invoice)
 
-    def get_iva(self, iva_code):
-        selected_iva = filter(lambda i: i["id"] == iva_code, self.ParamGetTiposIva())
-        return selected_iva[0] if selected_iva else None
-
     def add_iva(self, invoice):
-        iva_amount = (invoice.total * self.get_iva(invoice.iva_type).get("value")) / 100
-        self.AgregarIva(invoice.iva_type, invoice.total, iva_amount)
-        self.EstablecerCampoFactura("imp_iva", iva_amount)
-        self.EstablecerCampoFactura("imp_total", invoice.total + iva_amount)
+        iva_rate = invoice.get_iva_rate()
+        self.AgregarIva(invoice.iva_type, invoice.total, iva_rate)
+        self.EstablecerCampoFactura("imp_iva", iva_rate)
+        self.EstablecerCampoFactura("imp_total", invoice.total + iva_rate)
 
     def get_cae_due_date(self):
         return datetime.datetime.strptime(self.Vencimiento, '%Y%m%d').date()
