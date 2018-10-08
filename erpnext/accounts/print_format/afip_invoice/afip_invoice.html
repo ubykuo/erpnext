@@ -88,7 +88,7 @@
               <th scope="col">Cantidad</th>
               <th scope="col">Precio Unitario ({{ doc.get_currency().currency_name }})</th>
                 <th scope="col">Subtotal ({{ doc.get_currency().currency_name }})</th>
-                {% if doc.invoice_type != afip_settings.export_invoice_code %}
+                {% if doc.invoice_type == "1" %}
                     <th>Alicuota IVA</th>
                     <th>Subtotal c/IVA</th>
                 {% endif %}
@@ -99,8 +99,12 @@
                 <td></td>
                 <td>Sprint 1</td>
                 <td>1.00</td>
-                <td>{{ doc.grand_total }}</td>
-                <td>{{ doc.grand_total }}</td>
+                <td>{{ doc.total }}</td>
+                <td>{{ doc.total }}</td>
+                {% if doc.invoice_type == "1" %}
+                    <td>{{ doc.get_iva_rate() }}</td>
+                    <td>{{ doc.total + doc.get_iva_rate() }}</td>
+                {% endif %}}
             </tr>
         </tbody>
     </table>
@@ -117,11 +121,37 @@
             <p><span class="bold">Importe Total: {{ doc.get_currency().currency_name }} {{ doc.grand_total}}</span></p>
         </div>
     {% else %}
-        <!-- Tipos de IVA -->
-        <div class="col-md-4">
-        </div>
-        <div class="col-md-offset-4 col-md-4">
-            <p><span class="bold">Importe Total: {{ doc.get_currency().symbol }}{{ doc.grand_total}}</span></p>
+        <div class="col-md-offset-8 col-md-4">
+        <!-- Tipos de IVA si es Factura A (1) -->
+            <div class="row">
+            {% if doc.invoice_type == "1" %}
+                <div class="col-md-6">
+                    <p class="bold">Importe Neto:</p>
+                    {% for iva_type in doc.get_afip_service().ParamGetTiposIva() %}
+                        <p class="bold">IVA {{ iva_type.descripcion }}:</p>
+                    {% endfor %}
+                    <p class="bold">Importe Total:</p>
+                </div>
+                <div class="col-md-6">
+                    <p class="bold">{{ doc.get_formatted("total") }}</p>
+                    {% for iva_type in doc.get_afip_service().ParamGetTiposIva() %}
+                        {% if iva_type.id == doc.iva_type %}
+                            <p class="bold">{{ doc.get_currency().symbol }} {{ frappe.format_value(doc.get_iva_rate(),{"fieldtype":"Currency"}) }}</p>
+                        {% else %}
+                            <p class="bold">{{ doc.get_currency().symbol }} {{ frappe.format_value(0, {"fieldtype":"Currency"}) }}</p>
+                        {% endif %}
+                    {% endfor %}
+                    <p class="bold">{{ doc.get_currency().symbol }} {{ frappe.format_value(doc.total + doc.get_iva_rate(), {"fieldtype":"Currency"}) }}</p>
+                </div>
+            {% else %}
+                <div class="col-md-6">
+                    <p class="bold">Importe Total:</p>
+                </div>
+                <div class="col-md-6">
+                    <p class="bold">{{ doc.get_formatted("total") }}</p>
+                </div>
+            {% endif %}
+            </div>
         </div>
     {% endif %}
 
