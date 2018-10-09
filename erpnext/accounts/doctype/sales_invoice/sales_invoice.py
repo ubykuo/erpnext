@@ -22,7 +22,7 @@ from erpnext.stock.doctype.serial_no.serial_no import get_serial_nos, get_delive
 from erpnext.setup.doctype.company.company import update_company_current_month_sales
 from erpnext.accounts.general_ledger import get_round_off_account_and_cost_center
 
-from erpnext.accounts.afip.afip import authorize_invoice, connect_afip
+from erpnext.accounts.afip.afip import AFIP
 
 form_grid_templates = {
     "items": "templates/form_grid/item_grid.html"
@@ -950,7 +950,7 @@ class SalesInvoice(SellingController):
         else:
             self.validate_customer_address()
             self.validate_export_type()
-        authorize_invoice(self)
+        AFIP().authorize_invoice(self)
 
     def validate_invoice_type(self):
         if not filter(lambda invoice_type: invoice_type.code == self.invoice_type, get_afip_settings().invoice_types):
@@ -1007,7 +1007,7 @@ class SalesInvoice(SellingController):
             frappe.throw(_("Invalid {0}").format("Export Type"))
 
     def get_afip_service(self):
-        return connect_afip("wsfex") if self.is_export_invoice() else connect_afip("wsfe")
+        return AFIP().get_service(AFIP.WSFEX) if self.is_export_invoice() else AFIP().get_service(AFIP.WSFE)
 
     def get_iva(self):
         selected_iva = filter(lambda i: i["id"] == self.iva_type, self.get_afip_service().ParamGetTiposIva())
@@ -1134,10 +1134,10 @@ def get_afip_settings_as_dict():
 @frappe.whitelist()
 def setup_invoice_type(invoice_type):
     if invoice_type == get_afip_settings().export_invoice_code:
-        service = connect_afip("wsfex")
+        service = AFIP().get_service(AFIP.WSFEX)
         return {"points_of_sale": get_points_of_sale(service), "export_types": get_export_types(service)}
     else:
-        service = connect_afip("wsfe")
+        service = AFIP().get_service(AFIP.WSFE)
         return {"points_of_sale": get_points_of_sale(service), "concepts": get_invoice_concepts(service), "iva_types": get_iva_types(service)}
 
 
