@@ -979,6 +979,9 @@ class WSFEv1(BaseWS):
     def get_cae_due_date(self):
         return datetime.datetime.strptime(self.Vencimiento, '%Y%m%d').date()
 
+    def get_voucher_number(self):
+        return self.ObtenerCampoFactura("cbt_desde")
+
         
 def p_assert_eq(a,b):
     print a, a==b and '==' or '!=', b

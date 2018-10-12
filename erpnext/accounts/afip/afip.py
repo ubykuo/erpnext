@@ -44,6 +44,7 @@ def authorize_invoice (invoice):
     if service.Resultado == 'A':
         invoice.db_set("cae", service.CAE)
         invoice.db_set("cae_due_date", service.get_cae_due_date())
+        invoice.db_set("afip_voucher_number", service.get_voucher_number())
     else:
         frappe.throw(service.Obs + service.ErrMsg)
 

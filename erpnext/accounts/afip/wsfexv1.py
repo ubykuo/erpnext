@@ -549,6 +549,10 @@ class WSFEXv1(BaseWS):
     def get_cae_due_date(self):
         return datetime.datetime.strptime(self.Vencimiento, '%d/%m/%Y').date()
 
+    def get_voucher_number(self):
+        return self.CbteNro
+
+
 
 
 class WSFEX(WSFEXv1):
