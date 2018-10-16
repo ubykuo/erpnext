@@ -692,6 +692,11 @@ var change_service_dates_condition = function (frm) {
     frm.set_df_property("service_start_date", "hidden", !required_dates);
     frm.toggle_reqd("service_end_date", required_dates);
     frm.set_df_property("service_end_date", "hidden", !required_dates);
+    frm.toggle_reqd("payment_due_date",required_dates);
+    frm.set_df_property("payment_due_date", "hidden", !required_dates);
+    if (required_dates) {
+    	frm.set_value("payment_due_date",frappe.datetime.add_days(frappe.datetime.now_date(), 15));
+	}
 }
 
 var change_iva_type_condition = function (frm) {
