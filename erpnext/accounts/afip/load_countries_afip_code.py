@@ -1,7 +1,7 @@
 
 import requests
 import frappe
-from erpnext.accounts.afip.afip import connect_afip
+from erpnext.accounts.afip.afip import AFIP
 
 def Translate(source, target, text):
     parametros = {'sl': source, 'tl': target, 'q': text}
@@ -15,8 +15,7 @@ def Translate(source, target, text):
         return None
 
 def update_countries():
-    service = connect_afip("wsfex")
-    countries = service.GetParamDstPais()
+    countries = AFIP().get_service(AFIP.WSFEX).GetParamDstPais()
     for country in countries:
         country = country.split("|")
         country_translated = Translate("es", "en", country[2])
