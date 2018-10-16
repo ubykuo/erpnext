@@ -21,7 +21,7 @@
         {% else %}
             <h5>FACTURA</h5>
         {% endif %}
-        <p class="bold">Compr. Nro:</p>
+        <p class="bold">Compr. Nro: {{ doc.get_formatted("afip_voucher_number") }}</p>
         <p class="bold">Fecha de Emision: {{ doc.get_formatted("posting_date") }}</p>
         <p><span class="bold">CUIT: </span>{{ company.get_formatted("cuit") }}</p>
         <p><span class="bold">Ingresos Brutos: </span>{{ company.get_formatted("ingresos_brutos") }}</p>
@@ -41,7 +41,7 @@
         <p><span class="bold">Hasta: </span>{{ doc.get_formatted("service_end_date") }}</p>
     </div>
     <div class="col-md-4">
-        <p><span class="bold">Fecha de Vto de pago: </span>{{ doc.get_formatted("due_date") }}</p>
+        <p><span class="bold">Fecha de Vto de pago: </span>{{ doc.get_formatted("payment_due_date") }}</p>
     </div>
 </div>
 {% endif %}
@@ -97,7 +97,7 @@
         <tbody>
             <tr>
                 <td></td>
-                <td>Sprint 1</td>
+                <td>{{ doc.get_formatted("afip_description") }}</td>
                 <td>1.00</td>
                 <td>{{ doc.total }}</td>
                 <td>{{ doc.total }}</td>
