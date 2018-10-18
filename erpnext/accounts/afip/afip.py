@@ -1,15 +1,10 @@
 import frappe
 import erpnext
-import datetime
 import os
 from frappe import _
 from erpnext.accounts.afip.wsaa import WSAA
 from erpnext.accounts.afip.wsfev1 import WSFEv1
 from erpnext.accounts.afip.wsfexv1 import WSFEXv1
-
-CERT = os.path.dirname(os.path.abspath(__file__)) + "/ubykuoERP.crt"  # El certificado X.509 obtenido de Seg. Inf.
-PRIVATEKEY = os.path.dirname(os.path.abspath(__file__)) + "/ClavePrivadaUbykuo.key"  # La clave privada del certificado CERT
-CACERT = os.path.dirname(os.path.abspath(__file__)) + "/conf/afip_ca_info.crt"
 
 class AFIP(object):
 
@@ -39,7 +34,9 @@ class AFIP(object):
         if not company or not company.cuit:
             frappe.throw(_("Company CUIT is required to connect to AFIP"))
         wsaa = WSAA()
-        access_ticket = wsaa.Autenticar(service_name, CERT, PRIVATEKEY, debug=True)
+        access_ticket = wsaa.Autenticar(service_name, os.path.join(os.getcwd(),frappe.conf.get("afip_certificate")),
+                                        os.path.join(os.getcwd(),frappe.conf.get("afip_private_key")),
+                                        cache=os.path.join(os.getcwd(),frappe.conf.get("afip_cache_path")))
         service = self.services_classes.get(service_name)()
         service.SetTicketAcceso(access_ticket)
         service.Cuit = company.cuit
