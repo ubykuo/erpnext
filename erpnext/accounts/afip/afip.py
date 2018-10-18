@@ -36,7 +36,8 @@ class AFIP(object):
         wsaa = WSAA()
         access_ticket = wsaa.Autenticar(service_name, os.path.join(os.getcwd(),frappe.conf.get("afip_certificate")),
                                         os.path.join(os.getcwd(),frappe.conf.get("afip_private_key")),
-                                        cache=os.path.join(os.getcwd(),frappe.conf.get("afip_cache_path")))
+                                        cache=os.path.join(os.getcwd(),frappe.conf.get("afip_cache_path")),
+                                        wsdl=frappe.conf.get("afip_wsaa_url"))
         service = self.services_classes.get(service_name)()
         service.SetTicketAcceso(access_ticket)
         service.Cuit = company.cuit

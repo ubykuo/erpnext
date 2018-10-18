@@ -26,9 +26,10 @@ import decimal
 import os
 import sys
 from utils import inicializar_y_capturar_excepciones, BaseWS, get_install_dir
+import frappe
 
-HOMO = True
-WSDL="https://wswhomo.afip.gov.ar/wsfexv1/service.asmx?WSDL"
+HOMO = frappe.conf.get("afip_homologation_mode")
+WSDL = frappe.conf.get("afip_wsfex_url")
 
 
 class WSFEXv1(BaseWS):

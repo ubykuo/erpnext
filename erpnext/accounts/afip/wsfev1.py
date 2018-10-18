@@ -30,14 +30,15 @@ import decimal
 import os
 import sys
 from utils import verifica, inicializar_y_capturar_excepciones, BaseWS, get_install_dir
+import frappe
 
-HOMO = True                    # solo homologación
+HOMO = frappe.conf.get("afip_homologation_mode")
 TYPELIB = False                 # usar librería de tipos (TLB)
 LANZAR_EXCEPCIONES = False      # valor por defecto: True
 
-#WSDL = "https://www.sistemasagiles.com.ar/simulador/wsfev1/call/soap?WSDL=None"
-WSDL = "https://wswhomo.afip.gov.ar/wsfev1/service.asmx?WSDL"
-#WSDL = "file:///home/reingart/tmp/service.asmx.xml"
+
+WSDL = frappe.conf.get("afip_wsfe_url")
+
 
 
 class WSFEv1(BaseWS):

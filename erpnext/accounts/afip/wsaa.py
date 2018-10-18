@@ -28,6 +28,8 @@ from pysimplesoap.client import SimpleXMLElement
 from utils import inicializar_y_capturar_excepciones, BaseWS, get_install_dir, \
      exception_info, safe_console, date
 
+import frappe
+
 try:
     from M2Crypto import BIO, Rand, SMIME, SSL
 except ImportError:
@@ -40,7 +42,7 @@ except ImportError:
     from base64 import b64encode
 
 # Constantes (si se usa el script de linea de comandos)
-WSDL = "https://wsaahomo.afip.gov.ar/ws/services/LoginCms?wsdl"  # El WSDL correspondiente al WSAA 
+WSDL = frappe.conf.get("afip_wsaa_url")  # El WSDL correspondiente al WSAA
 CERT = "ubykuoERP.crt"        # El certificado X.509 obtenido de Seg. Inf.
 PRIVATEKEY = "ClavePrivadaUbykuo.key"  # La clave privada del certificado CERT
 PASSPHRASE = "xxxxxxx"  # La contraseña para firmar (si hay)
@@ -55,10 +57,10 @@ SOAP_NS = "http://wsaa.view.sua.dvadac.desein.afip.gov"     # Revisar WSDL
 # Verificación del web server remoto, necesario para verificar canal seguro
 CACERT = "conf/afip_ca_info.crt" # WSAA CA Cert (Autoridades de Confiaza)
 
-HOMO = True
+HOMO = frappe.conf.get("afip_homologation_mode")
 TYPELIB = False
 DEFAULT_TTL = 60*60*5       # five hours
-DEBUG = True
+DEBUG = frappe.conf.get("afip_homologation_mode")
 
 # No debería ser necesario modificar nada despues de esta linea
 
