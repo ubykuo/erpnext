@@ -51,7 +51,7 @@
         <div class="col-md-6">
             <p><span class="bold">{{ doc.get_customer().get_id_type().id_name }}: </span>{{doc.get_customer().id_number }}</p>
             <p><span class="bold">Condicion frente al IVA:</span> {{ doc.get_customer().get_formatted("iva_condition") }}</p>
-            <p><span class="bold">Condicion de venta:</span></p>
+            <p><span class="bold">Condicion de venta:</span> {{ doc.get_formatted("sale_condition") }}</p>
         </div>
         <div class="col-md-6">
             <p><span class="bold">Apellido y Nombre / Razon Social: </span>{{ doc.get_customer().customer_name }}</p>
@@ -75,6 +75,7 @@
         <div class="col-md-5">
             <p><span class="bold">Divisa: </span>{{ doc.get_currency().currency_name }}</p>
             <p><span class="bold">Destino Comprobante: </span>{{ doc.export_country }}</p>
+            <p><span class="bold">Condicion de venta:</span> {{ doc.get_formatted("sale_condition") }}</p>
         </div>
     </div>
 
