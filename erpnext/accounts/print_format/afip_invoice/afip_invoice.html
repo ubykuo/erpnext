@@ -50,8 +50,8 @@
     <div class="row" style="margin-top: 20px">
         <div class="col-md-6">
             <p><span class="bold">{{ doc.get_customer().get_id_type().id_name }}: </span>{{doc.get_customer().id_number }}</p>
-            <p><span class="bold">Condicion frente al IVA:</span> </p>
-            <p><span class="bold">Condicion de venta:</span> </p>
+            <p><span class="bold">Condicion frente al IVA:</span> {{ doc.get_customer().get_formatted("iva_condition") }}</p>
+            <p><span class="bold">Condicion de venta:</span></p>
         </div>
         <div class="col-md-6">
             <p><span class="bold">Apellido y Nombre / Razon Social: </span>{{ doc.get_customer().customer_name }}</p>
