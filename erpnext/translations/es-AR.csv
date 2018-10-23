@@ -5374,7 +5374,7 @@ apps/erpnext/erpnext/healthcare/doctype/patient/patient_dashboard.py +6,This is 
 apps/erpnext/erpnext/buying/doctype/supplier/supplier_dashboard.py +6,This is based on transactions against this Supplier. See timeline below for details,Esto se basa en transacciones con este proveedor. Ver cronología abajo para más detalles
 DocType: Naming Series,This is the number of the last created transaction with this prefix,Este es el número de la última transacción creada con este prefijo
 DocType: Stock Reconciliation,This tool helps you to update or fix the quantity and valuation of stock in the system. It is typically used to synchronise the system values and what actually exists in your warehouses.,Esta herramienta le ayuda a actualizar o corregir la cantidad y la valoración de los valores en el sistema. Normalmente se utiliza para sincronizar los valores del sistema y lo que realmente existe en sus almacenes.
-DocType: Sales Invoice,This value is obtained from the customer address. See Address and Contact section,This value is obtained from the customer address. See Address and Contact section
+DocType: Sales Invoice,This value is obtained from the customer address. See Address and Contact section,Este valor se obtiene desde la dirección del cliente. Ver sección Dirección y Contacto
 DocType: Lab Test Template,This value is updated in the Default Sales Price List.,Este valor se actualiza en la Lista de Precios de venta predeterminada.
 DocType: Item Attribute Value,"This will be appended to the Item Code of the variant. For example, if your abbreviation is ""SM"", and the item code is ""T-SHIRT"", the item code of the variant will be ""T-SHIRT-SM""","Esto se añade al código del producto y la variante. Por ejemplo, si su abreviatura es ""SM"", y el código del artículo es ""CAMISETA"", entonces el código de artículo de la variante será ""CAMISETA-SM"""
 DocType: Crop Cycle,This will be day 1 of the crop cycle,Este será el día 1 del ciclo de cultivo
@@ -5806,7 +5806,7 @@ apps/erpnext/erpnext/config/non_profit.py +43,Volunteer information.,Voluntariad
 apps/erpnext/erpnext/stock/report/stock_ledger/stock_ledger.py +45,Voucher #,Comprobante #
 DocType: Stock Ledger Entry,Voucher Detail No,Detalle de Comprobante No
 DocType: GL Entry,Voucher No,Comprobante No.
-DocType: Sales Invoice,Voucher Number,Voucher Number
+DocType: Sales Invoice,Voucher Number,Número de Comprobante
 DocType: GL Entry,Voucher Type,Tipo de Comprobante
 apps/erpnext/erpnext/manufacturing/doctype/production_order/production_order_calendar.js +42,WIP Warehouse,Almacén de trabajos en proceso
 DocType: Workstation,Wages,Salarios
