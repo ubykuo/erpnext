@@ -616,9 +616,10 @@ frappe.ui.form.on('Sales Invoice', {
 	},
 
 	address_display: function (frm) {
-		// last string of address display field is the name of the country.
-        var address = frm.doc.address_display.split("<br>");
-		frm.set_value("export_country", address[address.length - 2]);
+	    if (frm.doc.invoice_type == frm.doc.afip_settings.export_invoice_code) {
+	       set_export_country(frm);
+        }
+
     }
 })
 
@@ -742,6 +743,7 @@ var set_up_invoice_type = function (frm) {
 	var is_export_invoice = frm.doc.invoice_type == frm.doc.afip_settings.export_invoice_code;
 	frm.toggle_reqd("export_type", is_export_invoice);
 	frm.set_df_property("export_type", "hidden", !is_export_invoice);
+	frm.set_df_property("export_country", "hidden", !is_export_invoice);
 
 	frm.toggle_reqd("concept", !is_export_invoice);
 	frm.set_df_property("concept", "hidden", is_export_invoice);
@@ -759,6 +761,7 @@ var set_up_invoice_type = function (frm) {
                if (is_export_invoice) {
                    frm.set_value("concept", null);
                    load_export_types(frm, r.message.export_types);
+                   set_export_country(frm);
                }
                else {
                    frm.set_value("export_type", null);
@@ -769,6 +772,12 @@ var set_up_invoice_type = function (frm) {
            }
        }
     });
+}
+
+var set_export_country = function (frm) {
+    // last string of address display field is the name of the country.
+    var address = frm.doc.address_display.split("<br>");
+    frm.set_value("export_country", address[address.length - 2]);
 }
 
 
