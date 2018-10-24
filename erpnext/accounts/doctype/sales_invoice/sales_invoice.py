@@ -1098,12 +1098,7 @@ def set_account_for_mode_of_payment(self):
             data.account = get_bank_cash_account(data.mode_of_payment, self.company).get("account")
 
 def get_invoice_concepts():
-    response = []
-    invoice_concepts = AFIP().get_service(AFIP.WSFE).ParamGetTiposConcepto()
-    for concept in invoice_concepts:
-        concept = concept.split("|")
-        response.append({"value": concept[0], "label": concept[1]})
-    return response
+    return [{"value": concept["id"], "label": concept["descripcion"]} for concept in AFIP().get_service(AFIP.WSFE).ParamGetTiposConcepto()]
 
 def get_iva_types():
     return [{"value": iva_type["id"], "label": iva_type["descripcion"]} for iva_type in AFIP().get_service(AFIP.WSFE).ParamGetTiposIva()]
@@ -1118,12 +1113,7 @@ def get_points_of_sale(invoice_type):
     return response
 
 def get_export_types():
-    response = []
-    export_types = AFIP().get_service(AFIP.WSFEX).GetParamTipoExpo()
-    for export_type in export_types:
-        export_type = export_type.split("|")
-        response.append({"value": export_type[0], "label": export_type[1] + " - " + export_type[0]})
-    return response
+    return [{"value": export_type["codigo"], "label": export_type["descripcion"]} for export_type in AFIP().get_service(AFIP.WSFEX).GetParamTipoExpo()]
 
 def get_afip_settings():
     return frappe.get_doc("AFIP Settings", None)

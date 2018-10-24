@@ -414,7 +414,7 @@ class WSFEXv1(BaseWS):
             return ret
 
     @inicializar_y_capturar_excepciones
-    def GetParamTipoExpo(self, sep="|"):
+    def GetParamTipoExpo(self, sep=""):
         "Recuperador de valores referenciales de codigos de Tipo de exportacion"
         ret = self.client.FEXGetPARAM_Tipo_Expo(
             Auth={'Token': self.Token, 'Sign': self.Sign, 'Cuit': self.Cuit, })
@@ -425,7 +425,7 @@ class WSFEXv1(BaseWS):
         for u in result['FEXResultGet']:
             u = u['ClsFEXResponse_Tex']
             try:
-                r = {'codigo': u.get('Tex_Id'), 'ds': u.get('Tex_Ds'),
+                r = {'codigo': u.get('Tex_Id'), 'descripcion': u.get('Tex_Ds'),
                      'vig_desde': u.get('Tex_vig_desde'), 
                      'vig_hasta': u.get('Tex_vig_hasta')}
             except Exception, e:

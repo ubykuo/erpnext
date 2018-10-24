@@ -864,8 +864,7 @@ class WSFEv1(BaseWS):
             Auth={'Token': self.Token, 'Sign': self.Sign, 'Cuit': self.Cuit},
             )
         res = ret['FEParamGetTiposConceptoResult']
-        return [(u"%(Id)s\t%(Desc)s\t%(FchDesde)s\t%(FchHasta)s" % p['ConceptoTipo']).replace("\t", sep)
-                 for p in res['ResultGet']]
+        return [{"id": concepto['ConceptoTipo']['Id'], "descripcion": concepto["ConceptoTipo"]['Desc']} for concepto in res['ResultGet']]
                 
 
     @inicializar_y_capturar_excepciones
