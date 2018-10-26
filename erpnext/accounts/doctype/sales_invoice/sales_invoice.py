@@ -977,7 +977,7 @@ class SalesInvoice(SellingController):
         If concept is 2 or 3, service start date, service end date and payment due date are required
         :return:
         """
-        selected_concept = filter(lambda c: c["value"] == self.concept, get_invoice_concepts())
+        selected_concept = filter(lambda c: str(c.get("value")) == self.concept, get_invoice_concepts())
         if not selected_concept:
             frappe.throw(_("Invalid {0}".format(self.meta.get_label("concept"))))
         if self.concept in ("2", "3"):
@@ -1003,7 +1003,7 @@ class SalesInvoice(SellingController):
             frappe.throw(_("AFIP Code of target country is mandatory"))
 
     def validate_export_type(self):
-        if not filter(lambda export_type: export_type["value"] == self.export_type, get_export_types()):
+        if not filter(lambda export_type: str(export_type["value"]) == self.export_type, get_export_types()):
             frappe.throw(_("Invalid {0}").format("Export Type"))
 
     def get_afip_service(self):
