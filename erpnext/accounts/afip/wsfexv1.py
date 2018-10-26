@@ -539,9 +539,7 @@ class WSFEXv1(BaseWS):
                       obs_comerciales, obs, forma_pago, incoterms,
                       invoice.get_customer().get_language().afip_code, invoice.terms)
 
-        for item in invoice.items:
-            item_uom_code = item.get_uom().afip_code
-            self.AgregarItem(item.item_code, item.item_name, item.qty, item_uom_code if item_uom_code else afip_settings.default_uom, item.rate, item.amount)
+        self.AgregarItem(001, invoice.afip_description, 1, afip_settings.default_uom, invoice.grand_total, invoice.grand_total)
 
     def CAESolicitar(self):
         last_id = long(self.GetLastID()) + 1
