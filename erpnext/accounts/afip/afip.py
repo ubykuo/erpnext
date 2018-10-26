@@ -18,10 +18,9 @@ class AFIP(object):
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
             cls._instance = super(AFIP, cls).__new__(cls)
+            cls._instance.services = {}
         return cls._instance
 
-    def __init__(self):
-        self.services = {}
 
     def get_service(self, service_name, company=None):
         if not self.services.get(service_name,None) or self.services.get(service_name).TicketAcessoExpirado():
