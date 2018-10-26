@@ -34,10 +34,14 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 			me.frm.refresh_fields();
 		}
 
-        // Load invoice types, invoice concepts and iva types when creating a new invoice
+        // Load invoice types, invoice concepts and iva types when creating or editing an invoice
 		if (this.frm.doc.docstatus != 1) {
 		    load_afip_settings(this.frm);
 		    set_afip_required_fields(this.frm);
+		}
+
+		if (this.frm.is_new()) {
+			hide_invoice_type_specific_fields(this.frm);
 		}
 
 	},
@@ -778,6 +782,16 @@ var set_export_country = function (frm) {
     // last string of address display field is the name of the country.
     var address = frm.doc.address_display.split("<br>");
     frm.set_value("export_country", address[address.length - 2]);
+}
+
+var hide_invoice_type_specific_fields = function (frm) {
+    frm.set_df_property("concept", "hidden", true);
+    frm.set_df_property("export_type", "hidden", true);
+    frm.set_df_property("service_start_date", "hidden", true);
+    frm.set_df_property("service_end_date", "hidden", true);
+    frm.set_df_property("payment_due_date", "hidden", true);
+    frm.set_df_property("iva_type", "hidden", true);
+    frm.set_df_property("export_country", "hidden", true);
 }
 
 
