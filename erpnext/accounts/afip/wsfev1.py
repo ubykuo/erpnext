@@ -961,7 +961,7 @@ class WSFEv1(BaseWS):
         self.CrearFactura(invoice.concept, invoice.get_customer().get_id_type().code, invoice.get_customer().id_number,
                           invoice.invoice_type, invoice.point_of_sale, last_voucher_number + 1,
                           last_voucher_number + 1,
-                          invoice.grand_total, 0, invoice.total,
+                          invoice.grand_total, 0, invoice.grand_total,
                           0, 0, 0, self.date_to_string(invoice.posting_date), payment_due_date,
                           self.date_to_string(invoice.service_start_date),
                           self.date_to_string(invoice.service_end_date),
@@ -972,9 +972,9 @@ class WSFEv1(BaseWS):
 
     def add_iva(self, invoice):
         iva_rate = invoice.get_iva_rate()
-        self.AgregarIva(invoice.iva_type, invoice.total, iva_rate)
+        self.AgregarIva(invoice.iva_type, invoice.grand_total, iva_rate)
         self.EstablecerCampoFactura("imp_iva", iva_rate)
-        self.EstablecerCampoFactura("imp_total", invoice.total + iva_rate)
+        self.EstablecerCampoFactura("imp_total", invoice.grand_total + iva_rate)
 
     def get_cae_due_date(self):
         return datetime.datetime.strptime(self.Vencimiento, '%Y%m%d').date()

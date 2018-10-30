@@ -1014,7 +1014,7 @@ class SalesInvoice(SellingController):
         return selected_iva[0] if selected_iva else None
 
     def get_iva_rate(self):
-        return (self.total * self.get_iva().get("value")) / 100
+        return (self.grand_total * self.get_iva().get("value")) / 100
 
 def get_list_context(context=None):
     from erpnext.controllers.website_list_for_contact import get_list_context

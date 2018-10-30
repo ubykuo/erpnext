@@ -539,7 +539,9 @@ class WSFEXv1(BaseWS):
                       obs_comerciales, obs, forma_pago, incoterms,
                       invoice.get_customer().get_language().afip_code, invoice.terms)
 
-        self.AgregarItem(001, invoice.afip_description, 1, afip_settings.default_uom, invoice.grand_total, invoice.grand_total)
+        # invoice.total - invoice.discount_amount must be equal to invoice.grand_total
+        self.AgregarItem(001, invoice.afip_description, 1, afip_settings.default_uom, invoice.total, invoice.grand_total, invoice.discount_amount)
+
 
     def CAESolicitar(self):
         last_id = long(self.GetLastID()) + 1
