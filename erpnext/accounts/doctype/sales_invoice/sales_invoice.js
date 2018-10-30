@@ -689,6 +689,7 @@ var set_afip_required_fields = function (frm) {
     // set point_of_sale, invoice_type and concept fields as required
     frm.toggle_reqd("point_of_sale", frm.doc.authorize_afip);
     frm.toggle_reqd("invoice_type", frm.doc.authorize_afip);
+    frm.toggle_reqd("afip_description", frm.doc.authorize_afip);
 }
 
 var change_service_dates_condition = function (frm) {
