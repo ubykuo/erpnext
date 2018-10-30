@@ -496,11 +496,7 @@ class WSFEXv1(BaseWS):
             )
         self.__analizar_errores(ret['FEXGetPARAM_CtzResult'])
         res = ret['FEXGetPARAM_CtzResult'].get('FEXResultGet')
-        if res:
-            ctz = str(res.get('Mon_ctz',""))
-        else:
-            ctz = ''
-        return ctz
+        return res.get('Mon_ctz',None) if res else None
     
     @inicializar_y_capturar_excepciones
     def ParamGetPtosVenta(self, sep="|"):

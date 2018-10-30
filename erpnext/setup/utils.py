@@ -6,6 +6,7 @@ import frappe
 from frappe import _
 from frappe.utils import flt, add_days
 from frappe.utils import get_datetime_str, nowdate
+from erpnext.accounts.afip.afip import AFIP
 
 def get_root_of(doctype):
 	"""Get root element of a DocType with a tree structure"""
@@ -94,6 +95,12 @@ def get_exchange_rate(from_currency, to_currency, transaction_date=None):
 		value = cache.get(key)
 
 		if not value:
+			from_currency_doc = frappe.get_doc("Currency", from_currency)
+			print (from_currency_doc.afip_code)
+			value = AFIP().get_service(AFIP.WSFEX).ParamGetCotizacion(from_currency_doc.afip_code)
+			if value:
+				return value
+
 			import requests
 			api_url = "https://frankfurter.erpnext.org/{0}".format(transaction_date)
 			response = requests.get(api_url, params={
