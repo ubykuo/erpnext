@@ -1112,6 +1112,7 @@ def get_points_of_sale(invoice_type):
         response.append({"value": point_of_sale[0], "label": point_of_sale[1] + " - " + point_of_sale[0]})
     return response
 
+@frappe.whitelist()
 def get_export_types():
     return [{"value": export_type["codigo"], "label": export_type["descripcion"]} for export_type in AFIP().get_service(AFIP.WSFEX).GetParamTipoExpo()]
 

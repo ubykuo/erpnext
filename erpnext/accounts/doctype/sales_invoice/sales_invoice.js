@@ -727,6 +727,7 @@ var load_points_of_sale = function (frm, points_of_sale) {
 
 var load_export_types = function (frm, export_types) {
     frm.set_df_property("export_type", "options", export_types);
+    frm.set_value("export_type", frm.doc.afip_settings.default_export_type);
 }
 
 var load_afip_settings = function (frm) {
