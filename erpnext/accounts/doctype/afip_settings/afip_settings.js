@@ -7,10 +7,12 @@ frappe.ui.form.on('AFIP Settings', {
 	},
 	onload: function (frm) {
 		frappe.call({
-			"method": "erpnext.accounts.doctype.sales_invoice.sales_invoice.get_export_types",
+			"method": "erpnext.accounts.doctype.afip_settings.afip_settings.get_afip_values",
 			"callback": function (r) {
 				if (r.message) {
-					frm.set_df_property("default_export_type", "options", r.message);
+					frm.set_df_property("default_export_type", "options", r.message.export_types);
+					frm.set_df_property("default_iva_type", "options", r.message.iva_types);
+					frm.set_df_property("default_invoice_concept", "options", r.message.invoice_concepts);
 				}
             }
 		});

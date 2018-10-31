@@ -675,13 +675,13 @@ var load_invoice_types = function (frm) {
 
 var load_invoice_concepts = function (frm, concepts) {
     frm.set_df_property("concept", "options", concepts);
-    set_field_default_value(frm, "concept", 2);
+    set_field_default_value(frm, "concept", frm.doc.afip_settings.default_invoice_concept);
     frm.refresh_field("concept");
 }
 
 var load_iva_types = function (frm, iva_types) {
     frm.set_df_property("iva_type", "options", iva_types);
-    set_field_default_value(frm, "iva_type", 5);
+    set_field_default_value(frm, "iva_type", frm.doc.afip_settings.default_iva_type);
     frm.refresh_field("iva_type");
 }
 
