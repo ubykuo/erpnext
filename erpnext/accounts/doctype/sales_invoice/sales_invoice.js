@@ -667,7 +667,7 @@ var calculate_total_billing_amount =  function(frm) {
 var load_invoice_types = function (frm) {
     var options = [];
     $(frm.doc.afip_settings.invoice_types).each(function (i, invoice_type) {
-       options.push({"label": invoice_type.name, "value": invoice_type.code});
+       options.push({"label": invoice_type.invoice_type_name, "value": invoice_type.code});
     });
     frm.set_df_property("invoice_type", "options", options);
     frm.refresh_field("invoice_type");

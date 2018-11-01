@@ -23,6 +23,7 @@ from erpnext.setup.doctype.company.company import update_company_current_month_s
 from erpnext.accounts.general_ledger import get_round_off_account_and_cost_center
 
 from erpnext.accounts.afip.afip import AFIP
+from frappe.exceptions import DoesNotExistError
 
 form_grid_templates = {
     "items": "templates/form_grid/item_grid.html"
@@ -927,8 +928,10 @@ class SalesInvoice(SellingController):
         return frappe.get_doc("Currency", self.currency)
 
     def get_customer_address(self):
-        return frappe.get_doc("Address", self.customer_address)
-
+        try:
+            return frappe.get_doc("Address", self.customer_address)
+        except DoesNotExistError:
+            return None
 
     def is_export_invoice(self):
         afip_settings = get_afip_settings()
