@@ -182,7 +182,7 @@ class Customer(TransactionBase):
             frappe.db.set(self, "customer_name", newdn)
 
     def get_id_type(self):
-        return frappe.get_doc("Identification Type", self.id_type)
+        return frappe.get_doc("Identification Type", self.id_type) if frappe.db.exists("Identification Type", self.id_type) else None
 
     def get_language(self):
         return frappe.get_doc("Language", self.language)
