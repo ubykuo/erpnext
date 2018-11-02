@@ -21,7 +21,7 @@
         {% else %}
             <h5>FACTURA</h5>
         {% endif %}
-        <p class="bold">Compr. Nro: {{ doc.get_formatted("afip_voucher_number") }}</p>
+        <p class="bold">Compr. Nro: {{ '%08d' % (doc.afip_voucher_number | int) }}</p>
         <p class="bold">Fecha de Emision: {{ doc.get_formatted("posting_date") }}</p>
         <p><span class="bold">CUIT: </span>{{ company.get_formatted("cuit") }}</p>
         <p><span class="bold">Ingresos Brutos: </span>{{ company.get_formatted("ingresos_brutos") }}</p>
