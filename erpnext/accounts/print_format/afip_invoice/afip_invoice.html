@@ -63,8 +63,8 @@
     <div class="row" style="margin-top: 20px">
         <div class="col-md-5">
             <p><span class="bold">Se&ntilde;or(es): </span>{{ doc.get_customer().customer_name }}</p>
-            <p><span class="bold">CUIT Pais: </span>{{ doc.get_customer().get_id_type().id_name }}</p>
-            <p><span class="bold">ID Impositivo: </span>{{doc.get_customer().id_number }}</p>
+            <p><span class="bold">CUIT Pais: </span>{% if doc.get_customer().get_id_type() is not none %}{{ doc.get_customer().get_id_type().id_name }}{% endif %}</p>
+            <p><span class="bold">ID Impositivo: </span>{{ frappe.format_value(doc.get_customer().id_number, {"fieldtype": "Data"}) }}</p>
         </div>
         <div class="col-md-5">
             <p><span class="bold">Domicilio: </span>{% if doc.get_customer_address() is not none %}{{ doc.get_customer_address().get_as_string() }}{% endif %}</p>
