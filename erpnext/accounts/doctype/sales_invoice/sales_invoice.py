@@ -1112,7 +1112,7 @@ def get_points_of_sale(invoice_type):
     points_of_sale = service.ParamGetPtosVenta()
     for point_of_sale in points_of_sale:
         point_of_sale = point_of_sale.split("|")
-        response.append({"value": point_of_sale[0], "label": point_of_sale[1] + " - " + point_of_sale[0]})
+        response.append({"value": point_of_sale[0], "label": point_of_sale[0]})
     return response
 
 @frappe.whitelist()
