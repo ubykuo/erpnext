@@ -21,6 +21,7 @@
         {% else %}
             <h5>FACTURA</h5>
         {% endif %}
+        <p class="bold">Punto de Venta: {{ '%04d' % (doc.point_of_sale | int) }}</p>
         <p class="bold">Compr. Nro: {{ '%08d' % (doc.afip_voucher_number | int) }}</p>
         <p class="bold">Fecha de Emision: {{ doc.get_formatted("posting_date") }}</p>
         <p><span class="bold">CUIT: </span>{{ company.get_formatted("cuit") }}</p>
