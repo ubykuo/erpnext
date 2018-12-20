@@ -49,7 +49,7 @@
 {% if doc.invoice_type != afip_settings.export_invoice_code %}
     <div class="row" style="margin-top: 20px">
         <div class="col-md-6">
-            <p><span class="bold">{{ doc.get_customer().get_id_type().id_name }}: </span>{{doc.get_customer().id_number }}</p>
+            {% if doc.get_customer().get_id_type() is not none and doc.get_customer().get_id_type().id_name is not none %}<p><span class="bold">{{ doc.get_customer().get_id_type().id_name }}:</span>{{doc.get_customer().id_number }}</p>{% endif %}
             <p><span class="bold">Condicion frente al IVA:</span> {{ doc.get_customer().get_formatted("iva_condition") }}</p>
             <p><span class="bold">Condicion de venta:</span> {{ doc.get_formatted("sale_condition") }}</p>
         </div>
