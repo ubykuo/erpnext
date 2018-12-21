@@ -525,16 +525,16 @@ class WSFEXv1(BaseWS):
         permiso_existente = ''
         obs_comerciales = None
         obs = None
-        forma_pago = None
         incoterms = None
+        incoterms_ds = None
         customer_id_type = invoice.get_customer().get_id_type().code if invoice.get_customer().get_id_type() else None
         last_voucher_number = long(self.GetLastCMP(invoice.invoice_type, invoice.point_of_sale)) + 1
         self.CrearFactura(invoice.invoice_type, invoice.point_of_sale, last_voucher_number, self.date_to_string(invoice.posting_date),
                       invoice.grand_total, invoice.export_type,permiso_existente, invoice.get_customer_address().get_country().afip_code,
                       invoice.get_customer().customer_name, customer_id_type, invoice.get_customer_address().address_line1,
                     invoice.get_customer().id_number, invoice.get_currency().afip_code, exchange_rate,
-                      obs_comerciales, obs, forma_pago, incoterms,
-                      invoice.get_customer().get_language().afip_code, invoice.terms)
+                      obs_comerciales, obs, invoice.sale_condition, incoterms,
+                      invoice.get_customer().get_language().afip_code, incoterms_ds)
 
         # invoice.total - invoice.discount_amount must be equal to invoice.grand_total
         self.AgregarItem(001, invoice.afip_description, 1, afip_settings.default_uom, invoice.total, invoice.grand_total, invoice.discount_amount)
